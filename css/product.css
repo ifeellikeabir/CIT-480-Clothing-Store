@@ -1,0 +1,425 @@
+/* =========================
+   General
+   ========================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 40px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f4f4f4;
+    color: #222;
+}
+
+h1 {
+    text-align: center;
+    font-size: 38px;
+    margin-bottom: 5px;
+}
+
+h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-top: 0;
+    margin-bottom: 30px;
+    color: #555;
+}
+        /* Top Navigation Bar (same as index.html) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 15px 30px;
+            margin: -40px -20px 40px -20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 10;
+        }
+        .nav-brand {
+            font-size: 22px;
+            font-weight: bold;
+            color: #111;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #444;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: #111;
+        }
+        .nav-btn {
+            background-color: #111;
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .nav-btn:hover {
+            background-color: #333 !important;
+        }
+        .cart-badge {
+            background-color: #111;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        /* Dropdown Menus */
+        .dropdown {
+            position: relative;
+        }
+        .dropdown-toggle::after {
+            content: " \25BE";
+            font-size: 12px;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 170px;
+            list-style: none;
+            margin: 0;
+            padding: 8px 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+        }
+        .dropdown:hover .dropdown-menu,
+        .dropdown:focus-within .dropdown-menu {
+            display: block;
+        }
+        .dropdown-right .dropdown-menu {
+            left: auto;
+            right: 0;
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 18px;
+        }
+        .dropdown-menu a:hover {
+            background-color: #f4f4f4;
+        }
+/* =========================
+   Product Page
+   ========================= */
+
+.product-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+/* =========================
+   Product Section
+   ========================= */
+
+.product {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+
+/* =========================
+   Product Image
+   ========================= */
+
+.product-image {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+}
+
+.product-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+}
+
+
+/* =========================
+   Product Information
+   ========================= */
+
+.product-info {
+    background-color: white;
+    padding: 35px;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+}
+
+.product-name {
+    font-size: 38px;
+    line-height: 1.2;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.product-price {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+
+/* =========================
+   Size Selection
+   ========================= */
+
+.size-section h2,
+.quantity-section h2 {
+    font-size: 20px;
+    text-align: left;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    color: #222;
+}
+
+.size-options {
+    display: flex;
+    gap: 10px;
+}
+
+.size-button {
+    width: 55px;
+    height: 45px;
+
+    padding: 0;
+
+    background-color: white;
+    color: #222;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    font-size: 16px;
+    font-weight: normal;
+
+    cursor: pointer;
+}
+
+.size-button:hover {
+    background-color: #f4f4f4;
+    border-color: #222;
+}
+
+.size-button.selected {
+    background-color: #111;
+    color: white;
+    border-color: #111;
+}
+
+.selected-size {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+
+/* =========================
+   Quantity
+   ========================= */
+
+.quantity-section {
+    margin-top: 30px;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+
+    width: fit-content;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.quantity-button {
+    width: 45px;
+    height: 45px;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+    border-radius: 0;
+
+    background-color: white;
+    color: #222;
+
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.quantity-button:hover {
+    background-color: #f4f4f4;
+}
+
+#quantity {
+    width: 50px;
+    text-align: center;
+    font-size: 16px;
+}
+
+
+/* =========================
+   Product Buttons
+   ========================= */
+
+.product-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    margin-top: 35px;
+}
+
+.cart-button,
+.wishlist-button {
+    width: 100%;
+    padding: 14px;
+
+    margin-top: 0;
+
+    border-radius: 6px;
+
+    font-size: 17px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.cart-button {
+    background-color: #111;
+    color: white;
+    border: none;
+}
+
+.cart-button:hover {
+    background-color: #333;
+}
+
+.wishlist-button {
+    background-color: white;
+    color: #111;
+    border: 1px solid #ccc;
+}
+
+.wishlist-button:hover {
+    background-color: #f4f4f4;
+}
+
+.wishlist-button.active {
+    background-color: #111;
+    color: white;
+}
+
+
+/* =========================
+   Description
+   ========================= */
+
+.description {
+    max-width: 1200px;
+
+    margin-top: 40px;
+    padding: 35px;
+
+    background-color: white;
+    border-radius: 12px;
+
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+}
+
+.description h2 {
+    text-align: left;
+    font-size: 24px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #222;
+}
+
+.description p {
+    max-width: 800px;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+
+/* =========================
+   Footer
+   ========================= */
+
+.site-footer {
+    max-width: 1200px;
+
+    margin: 40px auto 0 auto;
+    padding: 30px;
+
+    text-align: center;
+
+    color: #666;
+}
+
+
+/* =========================
+   Mobile
+   ========================= */
+
+@media (max-width: 768px) {
+
+    body {
+        padding: 20px;
+    }
+
+    .site-header {
+        flex-direction: column;
+        gap: 20px;
+
+        padding: 20px;
+    }
+
+    .site-header nav {
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .product {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .product-info {
+        padding: 25px;
+    }
+
+    .product-name {
+        font-size: 30px;
+    }
+
+    .description {
+        padding: 25px;
+    }
+}

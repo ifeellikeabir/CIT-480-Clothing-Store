@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wardrobe.io | Product</title>
+
+    <link rel="stylesheet" href="css/product.css">
+</head>
+
+<body>
+
+ <!-- Top Navigation Bar -->
+<nav class="navbar">
+    <a href="index.html" class="nav-brand">Wardrobe.io</a>
+
+    <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+
+        <li class="dropdown">
+            <a href="#shop" class="dropdown-toggle">Shop</a>
+            <ul class="dropdown-menu">
+                <li><a href="#tops">Tops</a></li>
+                <li><a href="#bottoms">Bottoms</a></li>
+                <li><a href="#accessories">Accessories</a></li>
+            </ul>
+        </li>
+
+        <li class="dropdown dropdown-right">
+            <a href="#" class="dropdown-toggle">My Account</a>
+            <ul class="dropdown-menu">
+                <li><a href="wishlist.html">Wishlist <span id="wishlist-nav-count" class="cart-badge">0</span></a></li>
+                <li><a href="cart.html">Cart <span id="cart-nav-count" class="cart-badge">0</span></a></li>
+                <li><a href="payment.html">Checkout</a></li>
+            </ul>
+        </li>
+
+        <li><a href="#" class="nav-btn">Log In</a></li>
+    </ul>
+</nav>
+
+
+    <main class="product-page">
+
+        <section class="product">
+
+            <!-- Product Image -->
+            <div class="product-image">
+                <img src="images/product-placeholder.jpg"
+                     alt="Wardrobe.io clothing item">
+            </div>
+
+
+            <!-- Product Information -->
+            <div class="product-info">
+
+                <h1 class="product-name">Classic Cotton Shirt</h1>
+
+                <p class="product-price">$29.99</p>
+
+                <!-- Size Selection -->
+                <div class="size-section">
+                    <h2>Size</h2>
+
+                    <div class="size-options">
+                        <button class="size-button" data-size="S">S</button>
+                        <button class="size-button" data-size="M">M</button>
+                        <button class="size-button" data-size="L">L</button>
+                    </div>
+
+                    <p class="selected-size">
+                        Selected size: <span id="selected-size">None</span>
+                    </p>
+                </div>
+
+
+                <!-- Quantity -->
+                <div class="quantity-section">
+                    <h2>Quantity</h2>
+
+                    <div class="quantity-controls">
+                        <button id="decrease-quantity" class="quantity-button">
+                            −
+                        </button>
+
+                        <span id="quantity">1</span>
+
+                        <button id="increase-quantity" class="quantity-button">
+                            +
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- Buttons -->
+                <div class="product-actions">
+
+                    <button id="add-to-cart" class="cart-button">
+                        Add to Cart
+                    </button>
+
+                    <button id="wishlist-button" class="wishlist-button">
+                        ♡ Add to Wishlist
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Product Description -->
+        <section class="description">
+
+            <h2>Product Description</h2>
+
+            <p>
+                This classic cotton shirt is designed for everyday comfort
+                and versatility. Made from soft, breathable material, it is
+                suitable for casual wear and can easily be paired with a
+                variety of outfits.
+            </p>
+
+            <p>
+                Available in small, medium, and large sizes.
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Cloth.io. All rights reserved.</p>
+    </footer>
+
+
+    <script src="js/product.js"></script>
+
+</body>
+</html>

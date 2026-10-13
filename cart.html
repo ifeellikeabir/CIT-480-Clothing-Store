@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wardrobe.io - Cart</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Top Navigation Bar (same as index.html) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 15px 30px;
+            margin: -40px -20px 40px -20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 10;
+        }
+        .nav-brand {
+            font-size: 22px;
+            font-weight: bold;
+            color: #111;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #444;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: #111;
+        }
+        .nav-btn {
+            background-color: #111;
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .nav-btn:hover {
+            background-color: #333 !important;
+        }
+        .cart-badge {
+            background-color: #111;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        /* Dropdown Menus */
+        .dropdown {
+            position: relative;
+        }
+        .dropdown-toggle::after {
+            content: " \25BE";
+            font-size: 12px;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 170px;
+            list-style: none;
+            margin: 0;
+            padding: 8px 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+        }
+        .dropdown:hover .dropdown-menu,
+        .dropdown:focus-within .dropdown-menu {
+            display: block;
+        }
+        .dropdown-right .dropdown-menu {
+            left: auto;
+            right: 0;
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 18px;
+        }
+        .dropdown-menu a:hover {
+            background-color: #f4f4f4;
+        }
+
+        /* Cart Container */
+        .cart-container {
+            background-color: white;
+            max-width: 800px;
+            margin: auto;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+        }
+        .cart-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .item-details h4 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            color: #222;
+        }
+        .item-details p {
+            margin: 0;
+            color: #666;
+            font-size: 15px;
+        }
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .quantity-control span {
+            min-width: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .btn-qty {
+            background-color: #fff;
+            color: #111;
+            border: 1px solid #ccc;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .btn-qty:hover {
+            background-color: #f0f0f0;
+            border-color: #999;
+        }
+        .btn-danger {
+            background-color: #fff;
+            color: #d9534f;
+            border: 1px solid #d9534f;
+            padding: 10px 16px;
+            width: auto;
+            margin-top: 0;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-danger:hover {
+            background-color: #fdf2f2;
+        }
+
+        /* Order Summary */
+        .cart-summary {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .summary-total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #111;
+            margin-top: 15px;
+        }
+        .checkout-btn {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            padding: 14px;
+            background-color: #111;
+            color: white;
+            border-radius: 6px;
+            font-size: 17px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .checkout-btn:hover {
+            background-color: #333;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .empty-state a {
+            color: #111;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        /* Phone layout */
+        @media (max-width: 700px) {
+            .navbar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 15px;
+            }
+            .nav-links {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">Wardrobe.io</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+
+            <li class="dropdown">
+                <a href="index.html#shop" class="dropdown-toggle">Shop</a>
+                <ul class="dropdown-menu">
+                    <li><a href="index.html#tops">Tops</a></li>
+                    <li><a href="index.html#bottoms">Bottoms</a></li>
+                    <li><a href="index.html#accessories">Accessories</a></li>
+                </ul>
+            </li>
+
+            <li class="dropdown dropdown-right">
+                <a href="#" class="dropdown-toggle active">My Account</a>
+                <ul class="dropdown-menu">
+                    <li><a href="wishlist.html">Wishlist <span id="wishlist-nav-count" class="cart-badge">0</span></a></li>
+                    <li><a href="cart.html" class="active">Cart <span id="cart-nav-count" class="cart-badge">0</span></a></li>
+                    <li><a href="payment.html">Checkout</a></li>
+                </ul>
+            </li>
+
+            <li><a href="#" class="nav-btn">Log In</a></li>
+        </ul>
+    </nav>
+
+    <h1>Wardrobe.io</h1>
+    <h2>My Cart</h2>
+
+    <div class="cart-container">
+        <h3 id="cart-header">Cart Items (0)</h3>
+
+        <!-- Cart items get added here by JavaScript -->
+        <div id="cart-content" class="cart-list"></div>
+
+        <!-- Order Summary (hidden when the cart is empty) -->
+        <div id="cart-summary" class="cart-summary">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="subtotal">$0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span id="shipping">$0.00</span>
+            </div>
+            <div class="summary-row summary-total">
+                <span>Total</span>
+                <span id="total">$0.00</span>
+            </div>
+            <a href="payment.html" class="checkout-btn">Proceed to Checkout</a>
+        </div>
+    </div>
+
+    <script>
+        const FREE_SHIPPING_MIN = 50;
+        const SHIPPING_COST = 5.99;
+
+        // Storage helpers (same keys as wishlist.html)
+        function getWishlist() {
+            const stored = localStorage.getItem('wardrobe_wishlist');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function getCart() {
+            const stored = localStorage.getItem('wardrobe_cart');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveCart(items) {
+            localStorage.setItem('wardrobe_cart', JSON.stringify(items));
+        }
+
+        // Items moved over from the wishlist don't have a quantity yet, so default to 1
+        function getQuantity(item) {
+            return item.quantity || 1;
+        }
+
+        function updateNavCounts() {
+            const wishlistItems = getWishlist();
+            const cartCount = getCart().reduce((total, item) => total + getQuantity(item), 0);
+
+            document.getElementById('wishlist-nav-count').textContent = wishlistItems.length;
+            document.getElementById('cart-nav-count').textContent = cartCount;
+        }
+
+        function updateSummary(items) {
+            const subtotal = items.reduce((total, item) => total + item.price * getQuantity(item), 0);
+            const shipping = subtotal >= FREE_SHIPPING_MIN ? 0 : SHIPPING_COST;
+
+            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('shipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
+            document.getElementById('total').textContent = `$${(subtotal + shipping).toFixed(2)}`;
+        }
+
+        function renderCart() {
+            const items = getCart();
+            const container = document.getElementById('cart-content');
+            const header = document.getElementById('cart-header');
+            const summary = document.getElementById('cart-summary');
+            const itemCount = items.reduce((total, item) => total + getQuantity(item), 0);
+
+            header.textContent = `Cart Items (${itemCount})`;
+            updateNavCounts();
+
+            if (items.length === 0) {
+                summary.style.display = 'none';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>Your cart is currently empty.</p>
+                        <a href="index.html#shop">Continue Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+
+            summary.style.display = 'block';
+            updateSummary(items);
+
+            container.innerHTML = items.map((item, index) => `
+                <div class="cart-item">
+                    <div class="item-details">
+                        <h4>${item.name}</h4>
+                        <p>Color: ${item.color} | Size: ${item.size} | <strong>$${(item.price * getQuantity(item)).toFixed(2)}</strong></p>
+                    </div>
+                    <div class="item-actions">
+                        <div class="quantity-control">
+                            <button class="btn-qty" onclick="changeQuantity(${index}, -1)">&minus;</button>
+                            <span>${getQuantity(item)}</span>
+                            <button class="btn-qty" onclick="changeQuantity(${index}, 1)">+</button>
+                        </div>
+                        <button class="btn-danger" onclick="removeItem(${index})">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changeQuantity(index, amount) {
+            let items = getCart();
+            const newQuantity = getQuantity(items[index]) + amount;
+
+            // Going below 1 removes the item
+            if (newQuantity < 1) {
+                removeItem(index);
+                return;
+            }
+
+            items[index].quantity = newQuantity;
+            saveCart(items);
+            renderCart();
+        }
+
+        function removeItem(index) {
+            let items = getCart();
+            items.splice(index, 1);
+            saveCart(items);
+            renderCart();
+        }
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', renderCart);
+    </script>
+
+</body>
+
+</html>

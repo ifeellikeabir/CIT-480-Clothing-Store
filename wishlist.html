@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wardrobe.io - Wishlist</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Top Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 15px 30px;
+            margin: -40px -20px 40px -20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        .nav-brand {
+            font-size: 22px;
+            font-weight: bold;
+            color: #111;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #444;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: #111;
+        }
+        .nav-btn {
+            background-color: #111;
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .nav-btn:hover {
+            background-color: #333 !important;
+        }
+        .cart-badge {
+            background-color: #111;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        /* Wishlist Container */
+        .wishlist-container {
+            background-color: white;
+            max-width: 800px;
+            margin: auto;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+        }
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .wishlist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .item-details h4 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            color: #222;
+        }
+        .item-details p {
+            margin: 0;
+            color: #666;
+            font-size: 15px;
+        }
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-secondary {
+            background-color: #fff;
+            color: #111;
+            border: 1px solid #ccc;
+            padding: 10px 16px;
+            width: auto;
+            margin-top: 0;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-secondary:hover {
+            background-color: #f0f0f0;
+            border-color: #999;
+        }
+        .btn-danger {
+            background-color: #fff;
+            color: #d9534f;
+            border: 1px solid #d9534f;
+            padding: 10px 16px;
+            width: auto;
+            margin-top: 0;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-danger:hover {
+            background-color: #fdf2f2;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <a href="#" class="nav-brand">Wardrobe.io</a>
+        <ul class="nav-links">
+            <li><a href="#" class="active">Wishlist <span id="wishlist-nav-count" class="cart-badge">0</span></a></li>
+            <li><a href="#">Cart <span id="cart-nav-count" class="cart-badge">0</span></a></li>
+            <li><a href="payment.html">Checkout</a></li>
+            <li><a href="#" class="nav-btn">Log In</a></li>
+        </ul>
+    </nav>
+
+    <h1>Wardrobe.io</h1>
+    <h2>My Wishlist</h2>
+
+    <div class="wishlist-container">
+        <h3 id="wishlist-header">Saved Items (0)</h3>
+
+        <!-- Wishlist Content Area -->
+        <div id="wishlist-content" class="wishlist-grid">
+            <!-- Dynamically populated via JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Storage helpers for Wishlist and Cart
+        function getWishlist() {
+            const stored = localStorage.getItem('wardrobe_wishlist');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveWishlist(items) {
+            localStorage.setItem('wardrobe_wishlist', JSON.stringify(items));
+        }
+
+        function getCart() {
+            const stored = localStorage.getItem('wardrobe_cart');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveCart(items) {
+            localStorage.setItem('wardrobe_cart', JSON.stringify(items));
+        }
+
+        function updateNavCounts() {
+            const wishlistItems = getWishlist();
+            const cartItems = getCart();
+            
+            document.getElementById('wishlist-nav-count').textContent = wishlistItems.length;
+            document.getElementById('cart-nav-count').textContent = cartItems.length;
+        }
+
+        function renderWishlist() {
+            const items = getWishlist();
+            const container = document.getElementById('wishlist-content');
+            const header = document.getElementById('wishlist-header');
+
+            header.textContent = `Saved Items (${items.length})`;
+            updateNavCounts();
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>Your wishlist is currently empty.</p>
+                        <a href="#" style="color: #111; font-weight: bold; text-decoration: underline;">Explore Products</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = items.map((item, index) => `
+                <div class="wishlist-item">
+                    <div class="item-details">
+                        <h4>${item.name}</h4>
+                        <p>Color: ${item.color} | Size: ${item.size} | <strong>$${item.price.toFixed(2)}</strong></p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-secondary" onclick="moveToCart(${index})">Move to Cart</button>
+                        <button class="btn-danger" onclick="removeItem(${index})">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeItem(index) {
+            let items = getWishlist();
+            items.splice(index, 1);
+            saveWishlist(items);
+            renderWishlist();
+        }
+
+        function moveToCart(index) {
+            let wishlist = getWishlist();
+            let cart = getCart();
+
+            let itemToMove = wishlist[index];
+            cart.push(itemToMove);
+            saveCart(cart);
+
+            wishlist.splice(index, 1);
+            saveWishlist(wishlist);
+
+            renderWishlist();
+            alert(`"${itemToMove.name}" has been moved to your cart!`);
+        }
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', renderWishlist);
+    </script>
+
+</body>
+
+</html>
