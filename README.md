@@ -22,3 +22,9 @@ Launch terminal/command prompt and run these commands:
  node server.js
 
 This SHOULD work now, if it doesnt reach out to Daniel
+
+## Live Website
+
+Click below to view our CIT 480 Clothing Store website:
+
+[View Wardrobe.io Website](https://ifeellikeabir.github.io/CIT-480-Clothing-Store/)
