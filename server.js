@@ -74,3 +74,91 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+// ==========================
+// CART API ENDPOINTS
+// ==========================
+
+// Get cart items
+app.get('/api/cart', (req, res) => {
+    const query = 'SELECT * FROM cart_items';
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Database error fetching cart' });
+        }
+        res.json(results);
+    });
+});
+
+// Add item to cart
+app.post('/api/cart', (req, res) => {
+    const { product_id, name, color, size, price, quantity } = req.body;
+    const query = 'INSERT INTO cart_items (product_id, name, color, size, price, quantity) VALUES (?, ?, ?, ?, ?, ?)';
+    
+    db.query(query, [product_id, name, color, size, price, quantity || 1], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to add item to cart' });
+        }
+        res.status(201).json({ message: 'Added to cart successfully', id: result.insertId });
+    });
+});
+
+// Remove item from cart
+app.delete('/api/cart/:id', (req, res) => {
+    const cartId = req.params.id;
+    const query = 'DELETE FROM cart_items WHERE id = ?';
+    
+    db.query(query, [cartId], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to remove cart item' });
+        }
+        res.json({ message: 'Cart item removed' });
+    });
+});
+
+// ==========================
+// WISHLIST API ENDPOINTS
+// ==========================
+
+// Get wishlist items
+app.get('/api/wishlist', (req, res) => {
+    const query = 'SELECT * FROM wishlist_items';
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Database error fetching wishlist' });
+        }
+        res.json(results);
+    });
+});
+
+// Add item to wishlist
+app.post('/api/wishlist', (req, res) => {
+    const { product_id, name, color, size, price } = req.body;
+    const query = 'INSERT INTO wishlist_items (product_id, name, color, size, price) VALUES (?, ?, ?, ?, ?)';
+    
+    db.query(query, [product_id, name, color, size, price], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to add to wishlist' });
+        }
+        res.status(201).json({ message: 'Added to wishlist successfully', id: result.insertId });
+    });
+});
+
+// Remove item from wishlist
+app.delete('/api/wishlist/:id', (req, res) => {
+    const wishlistId = req.params.id;
+    const query = 'DELETE FROM wishlist_items WHERE id = ?';
+    
+    db.query(query, [wishlistId], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to remove wishlist item' });
+        }
+        res.json({ message: 'Wishlist item removed' });
+    });
+});

@@ -221,35 +221,40 @@
     </div>
 
     <script>
-        // Storage helpers for Wishlist and Cart
-        function getWishlist() {
-            const stored = localStorage.getItem('wardrobe_wishlist');
-            return stored ? JSON.parse(stored) : [];
+        // Fetch wishlist items from MySQL backend
+        async function getWishlist() {
+            try {
+                const response = await fetch('http://localhost:3000/api/wishlist');
+                if (!response.ok) throw new Error('Failed to fetch wishlist');
+                return await response.json();
+            } catch (error) {
+                console.error("Error loading wishlist:", error);
+                return [];
+            }
         }
 
-        function saveWishlist(items) {
-            localStorage.setItem('wardrobe_wishlist', JSON.stringify(items));
+        // Fetch cart items for badge counts
+        async function getCartCount() {
+            try {
+                const response = await fetch('http://localhost:3000/api/cart');
+                if (!response.ok) return 0;
+                const cart = await response.json();
+                return cart.length;
+            } catch (error) {
+                return 0;
+            }
         }
 
-        function getCart() {
-            const stored = localStorage.getItem('wardrobe_cart');
-            return stored ? JSON.parse(stored) : [];
-        }
-
-        function saveCart(items) {
-            localStorage.setItem('wardrobe_cart', JSON.stringify(items));
-        }
-
-        function updateNavCounts() {
-            const wishlistItems = getWishlist();
-            const cartItems = getCart();
+        async function updateNavCounts() {
+            const wishlistItems = await getWishlist();
+            const cartCount = await getCartCount();
             
             document.getElementById('wishlist-nav-count').textContent = wishlistItems.length;
-            document.getElementById('cart-nav-count').textContent = cartItems.length;
+            document.getElementById('cart-nav-count').textContent = cartCount;
         }
 
-        function renderWishlist() {
-            const items = getWishlist();
+        async function renderWishlist() {
+            const items = await getWishlist();
             const container = document.getElementById('wishlist-content');
             const header = document.getElementById('wishlist-header');
 
@@ -266,40 +271,54 @@
                 return;
             }
 
-            container.innerHTML = items.map((item, index) => `
+            container.innerHTML = items.map((item) => `
                 <div class="wishlist-item">
                     <div class="item-details">
                         <h4>${item.name}</h4>
-                        <p>Color: ${item.color} | Size: ${item.size} | <strong>$${item.price.toFixed(2)}</strong></p>
+                        <p>Color: ${item.color || 'Standard'} | Size: ${item.size} | <strong>$${parseFloat(item.price).toFixed(2)}</strong></p>
                     </div>
                     <div class="item-actions">
-                        <button class="btn-secondary" onclick="moveToCart(${index})">Move to Cart</button>
-                        <button class="btn-danger" onclick="removeItem(${index})">Remove</button>
+                        <button class="btn-secondary" onclick="moveToCart(${item.id}, '${item.name}', '${item.color || 'Standard'}', '${item.size}', ${item.price})">Move to Cart</button>
+                        <button class="btn-danger" onclick="removeItem(${item.id})">Remove</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function removeItem(index) {
-            let items = getWishlist();
-            items.splice(index, 1);
-            saveWishlist(items);
-            renderWishlist();
+        async function removeItem(id) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/wishlist/${id}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to delete item');
+                renderWishlist();
+            } catch (error) {
+                console.error('Error removing item:', error);
+                alert('Could not remove item from wishlist.');
+            }
         }
 
-        function moveToCart(index) {
-            let wishlist = getWishlist();
-            let cart = getCart();
+        async function moveToCart(id, name, color, size, price) {
+            try {
+                // 1. Add item to cart API
+                const cartResponse = await fetch('http://localhost:3000/api/cart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, color, size, price, quantity: 1 })
+                });
+                if (!cartResponse.ok) throw new Error('Failed to add to cart');
 
-            let itemToMove = wishlist[index];
-            cart.push(itemToMove);
-            saveCart(cart);
+                // 2. Remove item from wishlist API
+                await fetch(`http://localhost:3000/api/wishlist/${id}`, {
+                    method: 'DELETE'
+                });
 
-            wishlist.splice(index, 1);
-            saveWishlist(wishlist);
-
-            renderWishlist();
-            alert(`"${itemToMove.name}" has been moved to your cart!`);
+                renderWishlist();
+                alert(`"${name}" has been moved to your cart!`);
+            } catch (error) {
+                console.error('Error moving item to cart:', error);
+                alert('Could not move item to cart.');
+            }
         }
 
         // Initial render on page load

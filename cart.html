@@ -304,108 +304,95 @@
     </div>
 
     <script>
-        const FREE_SHIPPING_MIN = 50;
-        const SHIPPING_COST = 5.99;
-
-        // Storage helpers (same keys as wishlist.html)
-        function getWishlist() {
-            const stored = localStorage.getItem('wardrobe_wishlist');
-            return stored ? JSON.parse(stored) : [];
+        // Fetch cart items from MySQL backend
+        async function getCart() {
+            try {
+                const response = await fetch('http://localhost:3000/api/cart');
+                if (!response.ok) throw new Error('Failed to fetch cart');
+                return await response.json();
+            } catch (error) {
+                console.error("Error loading cart:", error);
+                return [];
+            }
         }
 
-        function getCart() {
-            const stored = localStorage.getItem('wardrobe_cart');
-            return stored ? JSON.parse(stored) : [];
+        // Fetch wishlist items for badge counts
+        async function getWishlistCount() {
+            try {
+                const response = await fetch('http://localhost:3000/api/wishlist');
+                if (!response.ok) return 0;
+                const wishlist = await response.json();
+                return wishlist.length;
+            } catch (error) {
+                return 0;
+            }
         }
 
-        function saveCart(items) {
-            localStorage.setItem('wardrobe_cart', JSON.stringify(items));
+        async function updateNavCounts() {
+            const cartItems = await getCart();
+            const wishlistCount = await getWishlistCount();
+            
+            document.getElementById('cart-nav-count').textContent = cartItems.length;
+            document.getElementById('wishlist-nav-count').textContent = wishlistCount;
         }
 
-        // Items moved over from the wishlist don't have a quantity yet, so default to 1
-        function getQuantity(item) {
-            return item.quantity || 1;
-        }
-
-        function updateNavCounts() {
-            const wishlistItems = getWishlist();
-            const cartCount = getCart().reduce((total, item) => total + getQuantity(item), 0);
-
-            document.getElementById('wishlist-nav-count').textContent = wishlistItems.length;
-            document.getElementById('cart-nav-count').textContent = cartCount;
-        }
-
-        function updateSummary(items) {
-            const subtotal = items.reduce((total, item) => total + item.price * getQuantity(item), 0);
-            const shipping = subtotal >= FREE_SHIPPING_MIN ? 0 : SHIPPING_COST;
-
-            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('shipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
-            document.getElementById('total').textContent = `$${(subtotal + shipping).toFixed(2)}`;
-        }
-
-        function renderCart() {
-            const items = getCart();
+        async function renderCart() {
+            const items = await getCart();
             const container = document.getElementById('cart-content');
-            const header = document.getElementById('cart-header');
-            const summary = document.getElementById('cart-summary');
-            const itemCount = items.reduce((total, item) => total + getQuantity(item), 0);
+            const subtotalElem = document.getElementById('cart-subtotal');
+            const totalElem = document.getElementById('cart-total');
 
-            header.textContent = `Cart Items (${itemCount})`;
             updateNavCounts();
 
             if (items.length === 0) {
-                summary.style.display = 'none';
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <p>Your cart is currently empty.</p>
-                        <a href="index.html#shop">Continue Shopping</a>
-                    </div>
-                `;
-                return;
-            }
-
-            summary.style.display = 'block';
-            updateSummary(items);
-
-            container.innerHTML = items.map((item, index) => `
-                <div class="cart-item">
-                    <div class="item-details">
-                        <h4>${item.name}</h4>
-                        <p>Color: ${item.color} | Size: ${item.size} | <strong>$${(item.price * getQuantity(item)).toFixed(2)}</strong></p>
-                    </div>
-                    <div class="item-actions">
-                        <div class="quantity-control">
-                            <button class="btn-qty" onclick="changeQuantity(${index}, -1)">&minus;</button>
-                            <span>${getQuantity(item)}</span>
-                            <button class="btn-qty" onclick="changeQuantity(${index}, 1)">+</button>
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <p>Your cart is currently empty.</p>
+                            <a href="index.html#shop" style="color: #111; font-weight: bold; text-decoration: underline;">Explore Products</a>
                         </div>
-                        <button class="btn-danger" onclick="removeItem(${index})">Remove</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function changeQuantity(index, amount) {
-            let items = getCart();
-            const newQuantity = getQuantity(items[index]) + amount;
-
-            // Going below 1 removes the item
-            if (newQuantity < 1) {
-                removeItem(index);
+                    `;
+                }
+                if (subtotalElem) subtotalElem.textContent = '$0.00';
+                if (totalElem) totalElem.textContent = '$0.00';
                 return;
             }
 
-            items[index].quantity = newQuantity;
-            saveCart(items);
-            renderCart();
+            // Calculate totals
+            let subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) * (item.quantity || 1)), 0);
+            let shipping = subtotal >= 50 ? 0 : 5.99;
+            let total = subtotal + shipping;
+
+            if (subtotalElem) subtotalElem.textContent = `$${subtotal.toFixed(2)}`;
+            if (totalElem) totalElem.textContent = `$${total.toFixed(2)}`;
+
+            if (container) {
+                container.innerHTML = items.map((item) => `
+                    <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee;">
+                        <div class="item-details">
+                            <h4>${item.name}</h4>
+                            <p>Color: ${item.color || 'Standard'} | Size: ${item.size} | Qty: ${item.quantity || 1}</p>
+                            <p><strong>$${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}</strong></p>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn-danger" onclick="removeCartItem(${item.id})">Remove</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
         }
 
-        function removeItem(index) {
-            let items = getCart();
-            items.splice(index, 1);
-            saveCart(items);
-            renderCart();
+        async function removeCartItem(id) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/cart/${id}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to delete cart item');
+                renderCart();
+            } catch (error) {
+                console.error('Error removing cart item:', error);
+                alert('Could not remove item from cart.');
+            }
         }
 
         // Initial render on page load
