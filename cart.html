@@ -272,7 +272,7 @@
                 </ul>
             </li>
 
-            <li><a href="#" class="nav-btn">Log In</a></li>
+            <li><a href="login.html" class="nav-btn">Log In</a></li>
         </ul>
     </nav>
 
@@ -398,6 +398,37 @@
         // Initial render on page load
         document.addEventListener('DOMContentLoaded', renderCart);
     </script>
+
+    <script>
+    // Check session status on page load
+    async function checkAuthSession() {
+        try {
+            const response = await fetch('http://localhost:3000/api/check-session'); // Optional, or manage via client state
+            // If you stored user state in localStorage upon login:
+            const currentUser = localStorage.getItem('wardrobe_user');
+            const loginBtn = document.querySelector('.nav-btn');
+
+            if (currentUser && loginBtn) {
+                loginBtn.textContent = `Hi, ${currentUser}`;
+                loginBtn.href = "#";
+                loginBtn.style.backgroundColor = "#333";
+                
+                // Optional: click to logout
+                loginBtn.onclick = async () => {
+                    if (confirm("Do you want to log out?")) {
+                        await fetch('http://localhost:3000/api/logout', { method: 'POST' });
+                        localStorage.removeItem('wardrobe_user');
+                        window.location.reload();
+                    }
+                };
+            }
+        } catch (e) {
+            console.error("Auth check error:", e);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', checkAuthSession);
+</script>
 
 </body>
 

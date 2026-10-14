@@ -162,3 +162,72 @@ app.delete('/api/wishlist/:id', (req, res) => {
         res.json({ message: 'Wishlist item removed' });
     });
 });
+
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+
+// Configure session middleware
+app.use(session({
+    secret: 'your_super_secret_key_here', // Change this to a secure random string for production
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // Set to true if using HTTPS
+}));
+
+// ==========================
+// AUTHENTICATION API ENDPOINTS
+// ==========================
+
+// Register a new user
+app.post('/api/register', async (req, res) => {
+    const { username, email, password } = req.body;
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const query = 'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)';
+        
+        db.query(query, [username, email, hashedPassword], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Username or email already exists' });
+            }
+            res.status(201).json({ message: 'User registered successfully!' });
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error during registration' });
+    }
+});
+
+// Login user
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    const query = 'SELECT * FROM users WHERE username = ?';
+    
+    db.query(query, [username], async (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(401).json({ error: 'Invalid username or password' });
+        }
+        
+        const user = results[0];
+        const match = await bcrypt.compare(password, user.password_hash);
+        
+        if (!match) {
+            return res.status(401).json({ error: 'Invalid username or password' });
+        }
+        
+        // Save user session
+        req.session.userId = user.id;
+        req.session.username = user.username;
+        
+        res.json({ message: 'Logged in successfully', username: user.username });
+    });
+});
+
+// Logout user
+app.post('/api/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) return res.status(500).json({ error: 'Could not log out' });
+        res.clearCookie('connect.sid');
+        res.json({ message: 'Logged out successfully' });
+    });
+});

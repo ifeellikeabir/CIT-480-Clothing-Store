@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wardrobe.io - Login / Register</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .auth-container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; }
+        h2 { text-align: center; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #111; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #333; }
+        .toggle-link { text-align: center; margin-top: 15px; font-size: 14px; color: #0066cc; cursor: pointer; }
+        .hidden { display: none; }
+        .error-msg { color: red; font-size: 13px; text-align: center; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h2 id="form-title">Login</h2>
+        <div id="error-message" class="error-msg"></div>
+
+        <!-- Login Form -->
+        <form id="auth-form" onsubmit="handleSubmit(event)">
+            <div class="form-group" id="email-group" style="display: none;">
+                <label for="email">Email</label>
+                <input type="email" id="email">
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" id="submit-btn">Login</button>
+        </form>
+
+        <div class="toggle-link" onclick="toggleMode()">Need an account? Register</div>
+        <div style="text-align: center; margin-top: 20px;"><a href="index.html" style="color: #666; text-decoration: none; font-size: 13px;">&larr; Back to Store</a></div>
+    </div>
+
+    <script>
+        let isRegistering = false;
+
+        function toggleMode() {
+            isRegistering = !isRegistering;
+            document.getElementById('form-title').textContent = isRegistering ? 'Register' : 'Login';
+            document.getElementById('submit-btn').textContent = isRegistering ? 'Register' : 'Login';
+            document.getElementById('email-group').style.display = isRegistering ? 'block' : 'none';
+            document.querySelector('.toggle-link').textContent = isRegistering ? 'Already have an account? Login' : 'Need an account? Register';
+            document.getElementById('error-message').textContent = '';
+        }
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+
+            const endpoint = isRegistering ? '/api/register' : '/api/login';
+            const payload = isRegistering ? { username, email, password } : { username, password };
+
+            try {
+                const response = await fetch(`http://localhost:3000${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Authentication failed');
+                }
+
+                alert(isRegistering ? 'Registration successful! Please log in.' : `Welcome back, ${data.username}!`);
+                if (isRegistering) {
+                    toggleMode(); // Switch back to login after successful register
+                } else {
+                    window.location.href = 'index.html'; // Redirect to home store page on successful login
+                }
+            } catch (error) {
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+    </script>
+</body>
+</html>
