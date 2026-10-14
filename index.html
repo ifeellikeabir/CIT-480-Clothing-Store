@@ -272,18 +272,6 @@
     </div>
 
     <script>
-        // Product list for the store
-        const products = [
-            { id: 1, name: "Classic White Tee",  category: "tops",        color: "White", price: 18.00, sizes: ["S", "M", "L", "XL"], swatch: "#eeeeee" },
-            { id: 2, name: "Black Hoodie",       category: "tops",        color: "Black", price: 45.00, sizes: ["S", "M", "L", "XL"], swatch: "#cfcfcf" },
-            { id: 3, name: "Denim Jacket",       category: "tops",        color: "Blue",  price: 65.00, sizes: ["S", "M", "L"],       swatch: "#c9d6e8" },
-            { id: 4, name: "Slim Fit Jeans",     category: "bottoms",     color: "Blue",  price: 50.00, sizes: ["28", "30", "32", "34"], swatch: "#c9d6e8" },
-            { id: 5, name: "Cargo Pants",        category: "bottoms",     color: "Olive", price: 42.00, sizes: ["28", "30", "32", "34"], swatch: "#d6dbc4" },
-            { id: 6, name: "Jogger Shorts",      category: "bottoms",     color: "Gray",  price: 28.00, sizes: ["S", "M", "L"],       swatch: "#dddddd" },
-            { id: 7, name: "Canvas Tote Bag",    category: "accessories", color: "Tan",   price: 22.00, sizes: ["One Size"],          swatch: "#e8dcc6" },
-            { id: 8, name: "Beanie",             category: "accessories", color: "Black", price: 15.00, sizes: ["One Size"],          swatch: "#cfcfcf" }
-        ];
-
         // Storage helpers (same keys as wishlist.html)
         function getWishlist() {
             const stored = localStorage.getItem('wardrobe_wishlist');
@@ -311,6 +299,22 @@
             document.getElementById('cart-nav-count').textContent = cartCount;
         }
 
+        // Global variable to hold fetched products from the database
+        let products = [];
+
+        async function fetchAndRenderProducts() {
+            try {
+                const response = await fetch('http://localhost:3000/api/products');
+                if (!response.ok) throw new Error("Failed to fetch products from server");
+                
+                products = await response.json();
+                renderProducts();
+            } catch (error) {
+                console.error("Error loading product catalog:", error);
+                document.getElementById('shop').innerHTML = "<p style='text-align:center;'>Could not load products from the database. Please make sure your server is running.</p>";
+            }
+        }
+
         function renderProducts() {
             const categories = ["tops", "bottoms", "accessories"];
 
@@ -318,35 +322,48 @@
                 const grid = document.getElementById(`${category}-grid`);
                 const items = products.filter(product => product.category === category);
 
-                grid.innerHTML = items.map(product => `
-                    <div class="product-card">
-                        <div class="product-image" style="background-color: ${product.swatch};">${product.name}</div>
-                        <div class="product-info">
-                            <h4>${product.name}</h4>
-                            <p>Color: ${product.color} | <strong>$${product.price.toFixed(2)}</strong></p>
-                            <select id="size-${product.id}">
-                                ${product.sizes.map(size => `<option value="${size}">Size: ${size}</option>`).join('')}
-                            </select>
-                            <div class="product-actions">
-                                <button onclick="addToCart(${product.id})">Add to Cart</button>
-                                <button class="btn-secondary" onclick="addToWishlist(${product.id})">&#9825; Save</button>
+                if (items.length === 0) {
+                    grid.innerHTML = "<p style='color: #777; font-size: 14px;'>No items in this category yet.</p>";
+                    return;
+                }
+
+                grid.innerHTML = items.map(product => {
+                    // Handle sizes array or fallback string from DB
+                    const sizeOptions = Array.isArray(product.sizes) 
+                        ? product.sizes 
+                        : typeof product.sizes === 'string' ? JSON.parse(product.sizes) : ["Standard"];
+
+                    return `
+                        <div class="product-card">
+                            <div class="product-image" style="background-color: ${product.swatch || '#eee'};">${product.name}</div>
+                            <div class="product-info">
+                                <h4>${product.name}</h4>
+                                <p>Color: ${product.color} | <strong>$${parseFloat(product.price).toFixed(2)}</strong></p>
+                                <select id="size-${product.id}">
+                                    ${sizeOptions.map(size => `<option value="${size}">Size: ${size}</option>`).join('')}
+                                </select>
+                                <div class="product-actions">
+                                    <button onclick="addToCart(${product.id})">Add to Cart</button>
+                                    <button class="btn-secondary" onclick="addToWishlist(${product.id})">&#9825; Save</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             });
         }
 
-        // Builds the item object that gets saved (matches wishlist.html format)
+        // Builds the item object that gets saved
         function buildItem(productId) {
             const product = products.find(p => p.id === productId);
-            const size = document.getElementById(`size-${productId}`).value;
+            const sizeElement = document.getElementById(`size-${productId}`);
+            const size = sizeElement ? sizeElement.value : "Standard";
 
             return {
                 name: product.name,
                 color: product.color,
                 size: size,
-                price: product.price
+                price: parseFloat(product.price)
             };
         }
 
@@ -354,7 +371,6 @@
             const newItem = buildItem(productId);
             let cart = getCart();
 
-            // If the same item and size is already in the cart, just add 1 to the quantity
             const existing = cart.find(item => item.name === newItem.name && item.size === newItem.size);
             if (existing) {
                 existing.quantity = (existing.quantity || 1) + 1;
@@ -384,9 +400,9 @@
             alert(`"${newItem.name}" was saved to your wishlist!`);
         }
 
-        // Initial render on page load
+        // Initial fetch and render on page load
         document.addEventListener('DOMContentLoaded', () => {
-            renderProducts();
+            fetchAndRenderProducts();
             updateNavCounts();
         });
     </script>
