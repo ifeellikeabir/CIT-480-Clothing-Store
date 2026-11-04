@@ -5,356 +5,193 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wardrobe.io - Wishlist</title>
+
+    <!-- Fonts: Anton (headlines), Inter (body), JetBrains Mono (labels) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Top Navigation Bar (matching index.html & cart.html) */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: white;
-            padding: 15px 30px;
-            margin: -40px -20px 40px -20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            position: relative;
-            z-index: 10;
-        }
-        .nav-brand {
-            font-size: 22px;
-            font-weight: bold;
-            color: #111;
-            text-decoration: none;
-        }
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-links a {
-            text-decoration: none;
-            color: #444;
-            font-size: 15px;
-            font-weight: 500;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            color: #111;
-        }
-        .nav-btn {
-            background-color: #111;
-            color: white !important;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-        .nav-btn:hover {
-            background-color: #333 !important;
-        }
-        .cart-badge {
-            background-color: #111;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-left: 4px;
-        }
-
-        /* Dropdown Menus */
-        .dropdown {
-            position: relative;
-        }
-        .dropdown-toggle::after {
-            content: " \25BE";
-            font-size: 12px;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            min-width: 170px;
-            list-style: none;
-            margin: 0;
-            padding: 8px 0;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
-        }
-        .dropdown:hover .dropdown-menu,
-        .dropdown:focus-within .dropdown-menu {
-            display: block;
-        }
-        .dropdown-right .dropdown-menu {
-            left: auto;
-            right: 0;
-        }
-        .dropdown-menu a {
-            display: block;
-            padding: 10px 18px;
-        }
-        .dropdown-menu a:hover {
-            background-color: #f4f4f4;
-        }
-
-        /* Wishlist Container */
-        .wishlist-container {
-            background-color: white;
-            max-width: 800px;
-            margin: auto;
-            padding: 35px;
-            border-radius: 12px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
-        }
-        .wishlist-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        .wishlist-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            background-color: #fafafa;
-        }
-        .item-details h4 {
-            margin: 0 0 5px 0;
-            font-size: 18px;
-            color: #222;
-        }
-        .item-details p {
-            margin: 0;
-            color: #666;
-            font-size: 15px;
-        }
-        .item-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .btn-secondary {
-            background-color: #fff;
-            color: #111;
-            border: 1px solid #ccc;
-            padding: 10px 16px;
-            width: auto;
-            margin-top: 0;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .btn-secondary:hover {
-            background-color: #f0f0f0;
-            border-color: #999;
-        }
-        .btn-danger {
-            background-color: #fff;
-            color: #d9534f;
-            border: 1px solid #d9534f;
-            padding: 10px 16px;
-            width: auto;
-            margin-top: 0;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .btn-danger:hover {
-            background-color: #fdf2f2;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-        .empty-state p {
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-    </style>
 </head>
 
 <body>
 
-    <!-- Top Navigation Bar -->
-    <nav class="navbar">
-        <a href="index.html" class="nav-brand">Wardrobe.io</a>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
+    <!-- Scrolling ticker -->
+    <div class="announce" role="note" aria-label="Free shipping on all orders over $50">
+        <div class="marquee" aria-hidden="true">
+            <span>Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp; Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp;</span>
+            <span>Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp; Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp;</span>
+        </div>
+    </div>
 
-            <li class="dropdown">
-                <a href="index.html#shop" class="dropdown-toggle">Shop</a>
-                <ul class="dropdown-menu">
+    <!-- Top Navigation Bar -->
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <span class="brand-name">Wardrobe.io</span>
+                <span class="brand-tag">Est. 2026 / Northridge, CA</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+
+                <li class="dropdown">
+                    <a href="index.html#shop" class="dropdown-toggle">Shop</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="index.html#tops">Tops</a></li>
+                        <li><a href="index.html#bottoms">Bottoms</a></li>
+                        <li><a href="index.html#accessories">Accessories</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown dropdown-right">
+                    <a href="#" class="dropdown-toggle active">My Account</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="wishlist.html" class="active">Wishlist <span id="wishlist-nav-count" class="cart-badge wishlist-nav-count">0</span></a></li>
+                        <li><a href="cart.html">Bag <span id="cart-nav-count" class="cart-badge cart-nav-count">0</span></a></li>
+                        <li><a href="payment.html">Checkout</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="login.html" class="nav-btn">Log In</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Page Banner -->
+        <section class="page-banner">
+            <div class="wrap">
+                <p class="tag">/// Saved For Later</p>
+                <h1>Wishlist</h1>
+                <p id="wishlist-header">Loading your saved items...</p>
+            </div>
+        </section>
+
+        <div class="wrap page-body">
+            <!-- Wishlist items get added here by JavaScript -->
+            <div id="wishlist-content" class="wish-grid"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="wrap footer-grid">
+            <div>
+                <h4>Wardrobe.io</h4>
+                <p>Clean cuts, bold basics, zero noise. Everyday streetwear from the Valley. A CIT 480 group project at CSUN.</p>
+            </div>
+            <div>
+                <h4>Shop</h4>
+                <ul>
                     <li><a href="index.html#tops">Tops</a></li>
                     <li><a href="index.html#bottoms">Bottoms</a></li>
                     <li><a href="index.html#accessories">Accessories</a></li>
                 </ul>
-            </li>
-
-            <li class="dropdown dropdown-right">
-                <a href="#" class="dropdown-toggle active">My Account</a>
-                <ul class="dropdown-menu">
-                    <li><a href="wishlist.html" class="active">Wishlist <span id="wishlist-nav-count" class="cart-badge">0</span></a></li>
-                    <li><a href="cart.html">Cart <span id="cart-nav-count" class="cart-badge">0</span></a></li>
+            </div>
+            <div>
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="login.html">Log In</a></li>
+                    <li><a href="wishlist.html">Wishlist</a></li>
+                    <li><a href="cart.html">Bag</a></li>
                     <li><a href="payment.html">Checkout</a></li>
                 </ul>
-            </li>
-
-            <li><a href="login.html" class="nav-btn">Log In</a></li>
-        </ul>
-    </nav>
-
-    <h1>Wardrobe.io</h1>
-    <h2>My Wishlist</h2>
-
-    <div class="wishlist-container">
-        <h3 id="wishlist-header">Saved Items (0)</h3>
-
-        <!-- Wishlist Content Area -->
-        <div id="wishlist-content" class="wishlist-grid">
-            <!-- Dynamically populated via JavaScript -->
+            </div>
         </div>
-    </div>
+        <div class="wrap footer-bottom">
+            <span>&copy; 2026 Wardrobe.io</span>
+            <span>CIT 480 Clothing Store</span>
+        </div>
+        <p class="footer-wordmark" aria-hidden="true">Wardrobe.io</p>
+    </footer>
 
+    <script src="js/site.js"></script>
     <script>
-        // Fetch wishlist items from MySQL backend
-        async function getWishlist() {
-            try {
-                const response = await fetch('http://localhost:3000/api/wishlist');
-                if (!response.ok) throw new Error('Failed to fetch wishlist');
-                return await response.json();
-            } catch (error) {
-                console.error("Error loading wishlist:", error);
-                return [];
-            }
-        }
-
-        // Fetch cart items for badge counts
-        async function getCartCount() {
-            try {
-                const response = await fetch('http://localhost:3000/api/cart');
-                if (!response.ok) return 0;
-                const cart = await response.json();
-                return cart.length;
-            } catch (error) {
-                return 0;
-            }
-        }
-
-        async function updateNavCounts() {
-            const wishlistItems = await getWishlist();
-            const cartCount = await getCartCount();
-            
-            document.getElementById('wishlist-nav-count').textContent = wishlistItems.length;
-            document.getElementById('cart-nav-count').textContent = cartCount;
-        }
+        let wishlistItems = [];
 
         async function renderWishlist() {
-            const items = await getWishlist();
+            wishlistItems = await getWishlistItems();
             const container = document.getElementById('wishlist-content');
-            const header = document.getElementById('wishlist-header');
 
-            header.textContent = `Saved Items (${items.length})`;
+            document.getElementById('wishlist-header').textContent =
+                `[${String(wishlistItems.length).padStart(2, '0')}] saved item${wishlistItems.length === 1 ? '' : 's'}`;
             updateNavCounts();
 
-            if (items.length === 0) {
+            if (wishlistItems.length === 0) {
+                container.style.display = 'block';
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <p>Your wishlist is currently empty.</p>
-                        <a href="index.html#shop" style="color: #111; font-weight: bold; text-decoration: underline;">Explore Products</a>
+                    <div class="panel empty-state">
+                        <p class="big">Nothing Saved.</p>
+                        <p>Tap the heart on any piece to save it here.</p>
+                        <a href="index.html#shop" class="btn btn-accent">Shop the Drop &rarr;</a>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = items.map((item) => `
-                <div class="wishlist-item">
-                    <div class="item-details">
-                        <h4>${item.name}</h4>
-                        <p>Color: ${item.color || 'Standard'} | Size: ${item.size} | <strong>$${parseFloat(item.price).toFixed(2)}</strong></p>
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn-secondary" onclick="moveToCart(${item.id}, '${item.name}', '${item.color || 'Standard'}', '${item.size}', ${item.price})">Move to Cart</button>
-                        <button class="btn-danger" onclick="removeItem(${item.id})">Remove</button>
-                    </div>
-                </div>
-            `).join('');
+            container.style.display = '';
+            container.innerHTML = wishlistItems.map(item => {
+                const look = { ...item, id: item.product_id || item.id };
+                const link = item.product_id ? `product.html?id=${item.product_id}` : '#';
+                return `
+                    <article class="product-card">
+                        <a href="${link}" class="garment">
+                            <span class="item-no">#${String(item.product_id || '').padStart(3, '0')}</span>
+                            ${garmentSVG(look)}
+                        </a>
+                        <div class="product-body">
+                            <h4><a href="${link}">${escapeHtml(item.name)}</a></h4>
+                            <p class="product-meta">
+                                <span>${escapeHtml(item.color || 'Standard')} / ${escapeHtml(item.size)}</span>
+                                <span class="price">${money(item.price)}</span>
+                            </p>
+                            <div class="wish-actions">
+                                <button class="btn-block" onclick="moveToCart(${item.id})">Move to Bag</button>
+                                <button class="btn-link" onclick="removeItem(${item.id})">Remove</button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
         }
 
         async function removeItem(id) {
             try {
-                const response = await fetch(`http://localhost:3000/api/wishlist/${id}`, {
-                    method: 'DELETE'
-                });
-                if (!response.ok) throw new Error('Failed to delete item');
+                await api(`/api/wishlist/${id}`, { method: 'DELETE' });
+                showToast('Removed from your wishlist');
                 renderWishlist();
             } catch (error) {
                 console.error('Error removing item:', error);
-                alert('Could not remove item from wishlist.');
+                showToast('Could not remove item from wishlist.', true);
             }
         }
 
-        async function moveToCart(id, name, color, size, price) {
+        async function moveToCart(id) {
+            const item = wishlistItems.find(i => i.id === id);
+            if (!item) return;
+
             try {
-                // 1. Add item to cart API
-                const cartResponse = await fetch('http://localhost:3000/api/cart', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, color, size, price, quantity: 1 })
-                });
-                if (!cartResponse.ok) throw new Error('Failed to add to cart');
+                // 1. Add to the cart (keeps the product id so the bag can match it)
+                await addItemToCart({
+                    id: item.product_id,
+                    name: item.name,
+                    color: item.color,
+                    price: item.price
+                }, item.size, 1);
 
-                // 2. Remove item from wishlist API
-                await fetch(`http://localhost:3000/api/wishlist/${id}`, {
-                    method: 'DELETE'
-                });
+                // 2. Take it off the wishlist
+                await api(`/api/wishlist/${id}`, { method: 'DELETE' });
 
+                showToast(`Moved to bag: ${item.name}`);
                 renderWishlist();
-                alert(`"${name}" has been moved to your cart!`);
             } catch (error) {
                 console.error('Error moving item to cart:', error);
-                alert('Could not move item to cart.');
+                showToast('Could not move item to your bag.', true);
             }
         }
 
-        // Initial render on page load
         document.addEventListener('DOMContentLoaded', renderWishlist);
     </script>
-
-    <script>
-    // Check session status on page load
-    async function checkAuthSession() {
-        try {
-            const response = await fetch('http://localhost:3000/api/check-session'); // Optional, or manage via client state
-            // If you stored user state in localStorage upon login:
-            const currentUser = localStorage.getItem('wardrobe_user');
-            const loginBtn = document.querySelector('.nav-btn');
-
-            if (currentUser && loginBtn) {
-                loginBtn.textContent = `Hi, ${currentUser}`;
-                loginBtn.href = "#";
-                loginBtn.style.backgroundColor = "#333";
-                
-                // Optional: click to logout
-                loginBtn.onclick = async () => {
-                    if (confirm("Do you want to log out?")) {
-                        await fetch('http://localhost:3000/api/logout', { method: 'POST' });
-                        localStorage.removeItem('wardrobe_user');
-                        window.location.reload();
-                    }
-                };
-            }
-        } catch (e) {
-            console.error("Auth check error:", e);
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', checkAuthSession);
-</script>
 
 </body>
 

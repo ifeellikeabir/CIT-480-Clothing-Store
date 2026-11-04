@@ -21,8 +21,13 @@ node_modules/
 
 Launch terminal/command prompt and run these commands:
 
- npm install bcrypt express-session
- node server.js
+ npm install
+ npm start        (same as: node server.js)
+
+Then open the site at: http://localhost:3000
+(server.js now serves the website too, so the pages and the database run together.
+Keep that terminal open while you work. Refresh the browser to see your changes.
+If you change server.js, stop it with Ctrl + C and run npm start again.)
 
 
 This SHOULD work now, if it doesnt reach out to Daniel
