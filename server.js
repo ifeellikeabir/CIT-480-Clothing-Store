@@ -7,6 +7,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve the website files too, so the whole site runs at http://localhost:3000
+app.use(express.static(__dirname));
+
 // Create connection pool to MySQL database
 const db = mysql.createPool({
     host: process.env.DB_HOST,
@@ -105,6 +108,34 @@ app.post('/api/cart', (req, res) => {
     });
 });
 
+// Change the quantity of a cart item
+app.patch('/api/cart/:id', (req, res) => {
+    const quantity = parseInt(req.body.quantity, 10);
+    if (!quantity || quantity < 1) {
+        return res.status(400).json({ error: 'Quantity must be at least 1' });
+    }
+
+    const query = 'UPDATE cart_items SET quantity = ? WHERE id = ?';
+    db.query(query, [quantity, req.params.id], (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to update cart item' });
+        }
+        res.json({ message: 'Cart item updated' });
+    });
+});
+
+// Empty the whole cart (used after an order is placed)
+app.delete('/api/cart', (req, res) => {
+    db.query('DELETE FROM cart_items', (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to clear cart' });
+        }
+        res.json({ message: 'Cart cleared' });
+    });
+});
+
 // Remove item from cart
 app.delete('/api/cart/:id', (req, res) => {
     const cartId = req.params.id;
@@ -183,7 +214,8 @@ app.post('/api/register', async (req, res) => {
     const { username, email, password } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const query = 'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)';
+        // the users table calls this column `name`
+        const query = 'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)';
         
         db.query(query, [username, email, hashedPassword], (err, result) => {
             if (err) {
@@ -201,7 +233,7 @@ app.post('/api/register', async (req, res) => {
 // Login user
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    const query = 'SELECT * FROM users WHERE username = ?';
+    const query = 'SELECT * FROM users WHERE name = ?';
     
     db.query(query, [username], async (err, results) => {
         if (err || results.length === 0) {
@@ -217,9 +249,9 @@ app.post('/api/login', (req, res) => {
         
         // Save user session
         req.session.userId = user.id;
-        req.session.username = user.username;
-        
-        res.json({ message: 'Logged in successfully', username: user.username });
+        req.session.username = user.name;
+
+        res.json({ message: 'Logged in successfully', username: user.name });
     });
 });
 

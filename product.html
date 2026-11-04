@@ -1,142 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wardrobe.io | Product</title>
 
+    <!-- Fonts: Anton (headlines), Inter (body), JetBrains Mono (labels) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/product.css">
 </head>
 
 <body>
 
- <!-- Top Navigation Bar -->
-<nav class="navbar">
-    <a href="index.html" class="nav-brand">Wardrobe.io</a>
+    <!-- Scrolling ticker -->
+    <div class="announce" role="note" aria-label="Free shipping on all orders over $50">
+        <div class="marquee" aria-hidden="true">
+            <span>Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp; Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp;</span>
+            <span>Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp; Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp;</span>
+        </div>
+    </div>
 
-    <ul class="nav-links">
-        <li><a href="index.html" class="active">Home</a></li>
+    <!-- Top Navigation Bar -->
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <span class="brand-name">Wardrobe.io</span>
+                <span class="brand-tag">Est. 2026 / Northridge, CA</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
 
-        <li class="dropdown">
-            <a href="#shop" class="dropdown-toggle">Shop</a>
-            <ul class="dropdown-menu">
-                <li><a href="#tops">Tops</a></li>
-                <li><a href="#bottoms">Bottoms</a></li>
-                <li><a href="#accessories">Accessories</a></li>
+                <li class="dropdown">
+                    <a href="index.html#shop" class="dropdown-toggle active">Shop</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="index.html#tops">Tops</a></li>
+                        <li><a href="index.html#bottoms">Bottoms</a></li>
+                        <li><a href="index.html#accessories">Accessories</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown dropdown-right">
+                    <a href="#" class="dropdown-toggle">My Account</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="wishlist.html">Wishlist <span id="wishlist-nav-count" class="cart-badge wishlist-nav-count">0</span></a></li>
+                        <li><a href="cart.html">Bag <span id="cart-nav-count" class="cart-badge cart-nav-count">0</span></a></li>
+                        <li><a href="payment.html">Checkout</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="login.html" class="nav-btn">Log In</a></li>
             </ul>
-        </li>
+        </nav>
+    </header>
 
-        <li class="dropdown dropdown-right">
-            <a href="#" class="dropdown-toggle">My Account</a>
-            <ul class="dropdown-menu">
-                <li><a href="wishlist.html">Wishlist <span id="wishlist-nav-count" class="cart-badge">0</span></a></li>
-                <li><a href="cart.html">Cart <span id="cart-nav-count" class="cart-badge">0</span></a></li>
-                <li><a href="payment.html">Checkout</a></li>
-            </ul>
-        </li>
+    <main class="wrap product-page">
 
-        <li><a href="login.html" class="nav-btn">Log In</a></li>
-    </ul>
-</nav>
-
-
-    <main class="product-page">
+        <p class="breadcrumb">
+            <a href="index.html">Home</a> / <a href="index.html#shop" id="crumb-category">Shop</a> / <span id="crumb-name">Product</span>
+        </p>
 
         <section class="product">
 
-            <!-- Product Image -->
-            <div class="product-image">
-                <img src="images/product-placeholder.jpg"
-                     alt="Wardrobe.io clothing item">
-            </div>
-
+            <!-- Product Image (drawn from the product's name + color) -->
+            <div class="product-image garment" id="product-image"></div>
 
             <!-- Product Information -->
             <div class="product-info">
 
-                <h1 class="product-name">Classic Cotton Shirt</h1>
-
-                <p class="product-price">$29.99</p>
+                <p class="tag tag-accent" id="product-category">Wardrobe.io</p>
+                <h1 class="product-name">Loading...</h1>
+                <p class="product-price">&nbsp;</p>
+                <p class="product-color">Color: <span id="product-color">&ndash;</span></p>
 
                 <!-- Size Selection -->
                 <div class="size-section">
                     <h2>Size</h2>
-
-                    <div class="size-options">
-                        <button class="size-button" data-size="S">S</button>
-                        <button class="size-button" data-size="M">M</button>
-                        <button class="size-button" data-size="L">L</button>
-                    </div>
-
+                    <div class="size-options" id="size-options"></div>
                     <p class="selected-size">
                         Selected size: <span id="selected-size">None</span>
                     </p>
                 </div>
 
-
                 <!-- Quantity -->
                 <div class="quantity-section">
                     <h2>Quantity</h2>
-
-                    <div class="quantity-controls">
-                        <button id="decrease-quantity" class="quantity-button">
-                            −
-                        </button>
-
+                    <div class="qty">
+                        <button id="decrease-quantity" aria-label="Decrease quantity">&minus;</button>
                         <span id="quantity">1</span>
-
-                        <button id="increase-quantity" class="quantity-button">
-                            +
-                        </button>
+                        <button id="increase-quantity" aria-label="Increase quantity">+</button>
                     </div>
                 </div>
 
-
                 <!-- Buttons -->
                 <div class="product-actions">
-
-                    <button id="add-to-cart" class="cart-button">
-                        Add to Cart
-                    </button>
-
-                    <button id="wishlist-button" class="wishlist-button">
-                        ♡ Add to Wishlist
-                    </button>
-
+                    <button id="add-to-cart" class="btn-block">Add to Bag</button>
+                    <button id="wishlist-button" class="btn-outline btn-block">&#9825; Add to Wishlist</button>
                 </div>
 
+                <ul class="product-perks">
+                    <li>Free shipping on orders over $50</li>
+                    <li>Easy, everyday fit</li>
+                </ul>
             </div>
 
         </section>
 
-
         <!-- Product Description -->
-        <section class="description">
-
+        <section class="description panel">
             <h2>Product Description</h2>
-
-            <p>
-                This classic cotton shirt is designed for everyday comfort
-                and versatility. Made from soft, breathable material, it is
-                suitable for casual wear and can easily be paired with a
-                variety of outfits.
+            <p id="product-description">
+                Designed for everyday wear and made to go on repeat.
+                Clean lines, easy fit, and simple to pair with the rest of your rotation.
             </p>
+        </section>
 
-            <p>
-                Available in small, medium, and large sizes.
-            </p>
-
+        <!-- More from this category -->
+        <section class="related">
+            <div class="section-head">
+                <div>
+                    <p class="tag">More From This Category</p>
+                    <h2>You Might Also Like</h2>
+                </div>
+            </div>
+            <div class="product-grid" id="related-grid"></div>
         </section>
 
     </main>
 
-
+    <!-- Footer -->
     <footer class="site-footer">
-        <p>&copy; 2026 Cloth.io. All rights reserved.</p>
+        <div class="wrap footer-grid">
+            <div>
+                <h4>Wardrobe.io</h4>
+                <p>Clean cuts, bold basics, zero noise. Everyday streetwear from the Valley. A CIT 480 group project at CSUN.</p>
+            </div>
+            <div>
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="index.html#tops">Tops</a></li>
+                    <li><a href="index.html#bottoms">Bottoms</a></li>
+                    <li><a href="index.html#accessories">Accessories</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="login.html">Log In</a></li>
+                    <li><a href="wishlist.html">Wishlist</a></li>
+                    <li><a href="cart.html">Bag</a></li>
+                    <li><a href="payment.html">Checkout</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="wrap footer-bottom">
+            <span>&copy; 2026 Wardrobe.io</span>
+            <span>CIT 480 Clothing Store</span>
+        </div>
+        <p class="footer-wordmark" aria-hidden="true">Wardrobe.io</p>
     </footer>
 
-
+    <script src="js/site.js"></script>
     <script src="js/product.js"></script>
 
 </body>
+
 </html>

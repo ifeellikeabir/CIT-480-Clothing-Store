@@ -5,123 +5,224 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wardrobe.io - Checkout</title>
+
+    <!-- Fonts: Anton (headlines), Inter (body), JetBrains Mono (labels) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
-    
-<!-- Top Navigation Bar -->
-<nav class="navbar">
-    <a href="index.html" class="nav-brand">Wardrobe.io</a>
 
-    <ul class="nav-links">
-        <li><a href="index.html" class="active">Home</a></li>
+    <!-- Scrolling ticker -->
+    <div class="announce" role="note" aria-label="Free shipping on all orders over $50">
+        <div class="marquee" aria-hidden="true">
+            <span>Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp; Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp;</span>
+            <span>Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp; Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp;</span>
+        </div>
+    </div>
 
-        <li class="dropdown">
-            <a href="#shop" class="dropdown-toggle">Shop</a>
-            <ul class="dropdown-menu">
-                <li><a href="#tops">Tops</a></li>
-                <li><a href="#bottoms">Bottoms</a></li>
-                <li><a href="#accessories">Accessories</a></li>
+    <!-- Top Navigation Bar -->
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <span class="brand-name">Wardrobe.io</span>
+                <span class="brand-tag">Est. 2026 / Northridge, CA</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+
+                <li class="dropdown">
+                    <a href="index.html#shop" class="dropdown-toggle">Shop</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="index.html#tops">Tops</a></li>
+                        <li><a href="index.html#bottoms">Bottoms</a></li>
+                        <li><a href="index.html#accessories">Accessories</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown dropdown-right">
+                    <a href="#" class="dropdown-toggle active">My Account</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="wishlist.html">Wishlist <span id="wishlist-nav-count" class="cart-badge wishlist-nav-count">0</span></a></li>
+                        <li><a href="cart.html">Bag <span id="cart-nav-count" class="cart-badge cart-nav-count">0</span></a></li>
+                        <li><a href="payment.html" class="active">Checkout</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="login.html" class="nav-btn">Log In</a></li>
             </ul>
-        </li>
+        </nav>
+    </header>
 
-        <li class="dropdown dropdown-right">
-            <a href="#" class="dropdown-toggle">My Account</a>
-            <ul class="dropdown-menu">
-                <li><a href="wishlist.html">Wishlist <span id="wishlist-nav-count" class="cart-badge">0</span></a></li>
-                <li><a href="cart.html">Cart <span id="cart-nav-count" class="cart-badge">0</span></a></li>
-                <li><a href="payment.html">Checkout</a></li>
-            </ul>
-        </li>
+    <main>
+        <!-- Page Banner -->
+        <section class="page-banner">
+            <div class="wrap">
+                <p class="tag">/// Last Step</p>
+                <h1>Checkout</h1>
+                <p>Fill in your info and your order is locked in.</p>
+            </div>
+        </section>
 
-        <li><a href="login.html" class="nav-btn">Log In</a></li>
-    </ul>
-</nav>
+        <div class="wrap page-body" id="checkout-area">
+            <div class="two-col">
 
-    <h1>Wardrobe.io</h1>
-    <h2>Checkout</h2>
+                <form id="checkout-form" class="panel">
 
-    <form id="checkout-form">
+                    <h3 class="panel-title">01 / Shipping Information</h3>
+                    <div class="form-grid">
+                        <div class="form-row full">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" autocomplete="name" required>
+                        </div>
+                        <div class="form-row full">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" autocomplete="email" required>
+                        </div>
+                        <div class="form-row full">
+                            <label for="address">Address</label>
+                            <input type="text" id="address" name="address" autocomplete="street-address" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" autocomplete="address-level2" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="state">State</label>
+                            <input type="text" id="state" name="state" autocomplete="address-level1" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="zip">ZIP Code</label>
+                            <input type="text" id="zip" name="zip" autocomplete="postal-code" required>
+                        </div>
+                    </div>
 
-        <h3>Billing Information</h3>
+                    <h3 class="panel-title" style="margin-top: 14px;">02 / Payment Information</h3>
+                    <div class="form-grid">
+                        <div class="form-row full">
+                            <label for="card-name">Name on Card</label>
+                            <input type="text" id="card-name" name="card-name" autocomplete="cc-name" required>
+                        </div>
+                        <div class="form-row full">
+                            <label for="card-number">Card Number</label>
+                            <input type="text" id="card-number" name="card-number" inputmode="numeric" autocomplete="cc-number" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="expiration">Expiration Date</label>
+                            <input type="text" id="expiration" name="expiration" placeholder="MM/YY" autocomplete="cc-exp" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="cvv">CVV</label>
+                            <input type="password" id="cvv" name="cvv" inputmode="numeric" autocomplete="cc-csc" required>
+                        </div>
+                    </div>
 
-        <label for="name">Full Name:</label>
-        <input type="text" id="name" name="name" required>
+                    <button type="submit" id="submit-order-btn" class="btn-accent btn-block">Place Order &rarr;</button>
+                </form>
 
-        <br><br>
+                <!-- Order Summary (from the cart in the database) -->
+                <aside class="panel summary-panel">
+                    <h3 class="panel-title">Your Order</h3>
+                    <ul class="summary-items" id="summary-items"></ul>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span id="shipping">$0.00</span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <span>Total</span>
+                        <span id="total">$0.00</span>
+                    </div>
+                    <a href="cart.html" class="btn btn-outline btn-block">Edit Bag</a>
+                </aside>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+            </div>
+        </div>
+    </main>
 
-        <br><br>
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="wrap footer-grid">
+            <div>
+                <h4>Wardrobe.io</h4>
+                <p>Clean cuts, bold basics, zero noise. Everyday streetwear from the Valley. A CIT 480 group project at CSUN.</p>
+            </div>
+            <div>
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="index.html#tops">Tops</a></li>
+                    <li><a href="index.html#bottoms">Bottoms</a></li>
+                    <li><a href="index.html#accessories">Accessories</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="login.html">Log In</a></li>
+                    <li><a href="wishlist.html">Wishlist</a></li>
+                    <li><a href="cart.html">Bag</a></li>
+                    <li><a href="payment.html">Checkout</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="wrap footer-bottom">
+            <span>&copy; 2026 Wardrobe.io</span>
+            <span>CIT 480 Clothing Store</span>
+        </div>
+        <p class="footer-wordmark" aria-hidden="true">Wardrobe.io</p>
+    </footer>
 
-        <label for="address">Address:</label>
-        <input type="text" id="address" name="address" required>
-
-        <br><br>
-
-        <label for="city">City:</label>
-        <input type="text" id="city" name="city" required>
-
-        <br><br>
-
-        <label for="state">State:</label>
-        <input type="text" id="state" name="state" required>
-
-        <br><br>
-
-        <label for="zip">ZIP Code:</label>
-        <input type="text" id="zip" name="zip" required>
-
-
-        <h3>Payment Information</h3>
-
-        <label for="card-name">Name on Card:</label>
-        <input type="text" id="card-name" name="card-name" required>
-
-        <br><br>
-
-        <label for="card-number">Card Number:</label>
-        <input type="text" id="card-number" name="card-number" required>
-
-        <br><br>
-
-        <label for="expiration">Expiration Date:</label>
-        <input type="text" id="expiration" name="expiration" placeholder="MM/YY" required>
-
-        <br><br>
-
-        <label for="cvv">CVV:</label>
-        <input type="password" id="cvv" name="cvv" required>
-
-        <br><br>
-
-        <button type="submit" id="submit-order-btn">Place Order</button>
-
-    </form>
-
+    <script src="js/site.js"></script>
     <script>
-        document.getElementById('checkout-form').addEventListener('submit', async function(e) {
+        let cart = [];
+
+        function cartTotals(items) {
+            const subtotal = items.reduce((total, item) => total + parseFloat(item.price) * (item.quantity || 1), 0);
+            const shipping = shippingFor(subtotal);
+            return { subtotal, shipping, total: subtotal + shipping };
+        }
+
+        async function renderSummary() {
+            cart = await getCartItems();
+            const list = document.getElementById('summary-items');
+
+            if (cart.length === 0) {
+                list.innerHTML = `<li><span>Your bag is empty. <a href="index.html#shop">Go shopping</a></span></li>`;
+            } else {
+                list.innerHTML = cart.map(item => `
+                    <li>
+                        <span>${escapeHtml(item.name)} (${escapeHtml(item.size)}) &times; ${item.quantity || 1}</span>
+                        <span>${money(parseFloat(item.price) * (item.quantity || 1))}</span>
+                    </li>
+                `).join('');
+            }
+
+            const { subtotal, shipping, total } = cartTotals(cart);
+            document.getElementById('subtotal').textContent = money(subtotal);
+            document.getElementById('shipping').textContent = cart.length && shipping === 0 ? 'Free' : money(shipping);
+            document.getElementById('total').textContent = money(total);
+        }
+
+        document.getElementById('checkout-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            // 1. Get cart items from localStorage
-            const cart = JSON.parse(localStorage.getItem('wardrobe_cart')) || [];
+            // 1. Get the latest cart from the database
+            cart = await getCartItems();
             if (cart.length === 0) {
-                alert("Your cart is empty! Add some items before checking out.");
-                window.location.href = "index.html#shop";
+                showToast('Your bag is empty! Add some items before checking out.', true);
                 return;
             }
 
-            // 2. Calculate total amount
-            const subtotal = cart.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
-            const shipping = subtotal >= 50 ? 0 : 5.99;
-            const totalAmount = subtotal + shipping;
-
-            // 3. Construct payload matching your server.js route expectations
+            // 2. Build the order to match what server.js expects
+            const { total } = cartTotals(cart);
             const orderData = {
-                total_amount: totalAmount,
+                total_amount: total.toFixed(2),
                 shipping_name: document.getElementById('name').value,
                 shipping_email: document.getElementById('email').value,
                 shipping_address: document.getElementById('address').value,
@@ -131,32 +232,38 @@
                 items: cart
             };
 
+            const submitBtn = document.getElementById('submit-order-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Placing order...';
+
             try {
-                // 4. Send POST request to backend server
-                const response = await fetch('http://localhost:3000/api/orders', {
+                // 3. Save the order, then empty the cart
+                const result = await api('/api/orders', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
                     body: JSON.stringify(orderData)
                 });
+                await api('/api/cart', { method: 'DELETE' });
+                updateNavCounts();
 
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.error || 'Failed to place order');
-                }
-
-                // 5. Success! Clear cart storage and notify user
-                alert(`Order placed successfully! Order ID: ${result.orderId}`);
-                localStorage.removeItem('wardrobe_cart');
-                window.location.href = "index.html";
-
+                // 4. Show a confirmation
+                document.getElementById('checkout-area').innerHTML = `
+                    <div class="panel empty-state summary-panel" style="max-width: 640px; margin: 0 auto;">
+                        <p class="tag tag-accent">Order #${result.orderId}</p>
+                        <p class="big">You're Locked In, ${escapeHtml(orderData.shipping_name.split(' ')[0])}.</p>
+                        <p>Your total was ${money(total)}. It's headed to ${escapeHtml(orderData.city)}, ${escapeHtml(orderData.state)}.</p>
+                        <a href="index.html" class="btn btn-accent">Back to the Shop &rarr;</a>
+                    </div>
+                `;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (error) {
                 console.error('Checkout error:', error);
-                alert('There was a problem processing your order. Please make sure your server is running.');
+                showToast('There was a problem placing your order. Make sure the server is running.', true);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Place Order';
             }
         });
+
+        document.addEventListener('DOMContentLoaded', renderSummary);
     </script>
 
 </body>

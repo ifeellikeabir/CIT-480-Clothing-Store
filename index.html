@@ -5,438 +5,339 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wardrobe.io - Home</title>
+
+    <!-- Fonts: Anton (headlines), Inter (body), JetBrains Mono (labels) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Top Navigation Bar (same as wishlist.html) */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: white;
-            padding: 15px 30px;
-            margin: -40px -20px 40px -20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            position: relative;
-            z-index: 10;
-        }
-        .nav-brand {
-            font-size: 22px;
-            font-weight: bold;
-            color: #111;
-            text-decoration: none;
-        }
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-links a {
-            text-decoration: none;
-            color: #444;
-            font-size: 15px;
-            font-weight: 500;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            color: #111;
-        }
-        .nav-btn {
-            background-color: #111;
-            color: white !important;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-        .nav-btn:hover {
-            background-color: #333 !important;
-        }
-        .cart-badge {
-            background-color: #111;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-left: 4px;
-        }
-
-        /* Dropdown Menus */
-        .dropdown {
-            position: relative;
-        }
-        .dropdown-toggle::after {
-            content: " \25BE";
-            font-size: 12px;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            min-width: 170px;
-            list-style: none;
-            margin: 0;
-            padding: 8px 0;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
-        }
-        .dropdown:hover .dropdown-menu,
-        .dropdown:focus-within .dropdown-menu {
-            display: block;
-        }
-        .dropdown-right .dropdown-menu {
-            left: auto;
-            right: 0;
-        }
-        .dropdown-menu a {
-            display: block;
-            padding: 10px 18px;
-        }
-        .dropdown-menu a:hover {
-            background-color: #f4f4f4;
-        }
-
-        /* Hero Banner */
-        .hero {
-            background-color: #111;
-            color: white;
-            max-width: 1000px;
-            margin: 0 auto 40px auto;
-            padding: 60px 35px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        .hero h1 {
-            color: white;
-            margin-top: 0;
-        }
-        .hero p {
-            font-size: 18px;
-            color: #ccc;
-            margin-bottom: 25px;
-        }
-        .hero-btn {
-            display: inline-block;
-            background-color: white;
-            color: #111;
-            padding: 12px 28px;
-            border-radius: 6px;
-            font-weight: bold;
-            text-decoration: none;
-        }
-        .hero-btn:hover {
-            background-color: #ddd;
-        }
-
-        /* Product Section */
-        .shop-container {
-            max-width: 1000px;
-            margin: auto;
-        }
-        .category-title {
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            scroll-margin-top: 20px;
-        }
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-        .product-card {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        .product-image {
-            height: 180px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            font-weight: bold;
-            color: #555;
-        }
-        .product-info {
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-        .product-info h4 {
-            margin: 0 0 5px 0;
-            font-size: 18px;
-        }
-        .product-info p {
-            margin: 0 0 12px 0;
-            color: #666;
-            font-size: 15px;
-        }
-        .product-info select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 15px;
-            margin-bottom: 10px;
-        }
-        .product-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: auto;
-        }
-        .product-actions button {
-            margin-top: 0;
-            padding: 10px;
-            font-size: 14px;
-        }
-        .btn-secondary {
-            background-color: #fff;
-            color: #111;
-            border: 1px solid #ccc;
-        }
-        .btn-secondary:hover {
-            background-color: #f0f0f0;
-            border-color: #999;
-        }
-
-        /* Phone layout */
-        @media (max-width: 700px) {
-            .navbar {
-                flex-direction: column;
-                gap: 12px;
-                padding: 15px;
-            }
-            .nav-links {
-                gap: 15px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-        }
-    </style>
 </head>
 
 <body>
 
+    <!-- Scrolling ticker -->
+    <div class="announce" role="note" aria-label="Free shipping on all orders over $50">
+        <div class="marquee" aria-hidden="true">
+            <span>Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp; Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp;</span>
+            <span>Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp; Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp;</span>
+        </div>
+    </div>
+
     <!-- Top Navigation Bar -->
-    <nav class="navbar">
-        <a href="index.html" class="nav-brand">Wardrobe.io</a>
-        <ul class="nav-links">
-            <li><a href="index.html" class="active">Home</a></li>
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <span class="brand-name">Wardrobe.io</span>
+                <span class="brand-tag">Est. 2026 / Northridge, CA</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Home</a></li>
 
-            <li class="dropdown">
-                <a href="#shop" class="dropdown-toggle">Shop</a>
-                <ul class="dropdown-menu">
-                    <li><a href="#tops">Tops</a></li>
-                    <li><a href="#bottoms">Bottoms</a></li>
-                    <li><a href="#accessories">Accessories</a></li>
+                <li class="dropdown">
+                    <a href="#shop" class="dropdown-toggle">Shop</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#tops">Tops</a></li>
+                        <li><a href="#bottoms">Bottoms</a></li>
+                        <li><a href="#accessories">Accessories</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown dropdown-right">
+                    <a href="#" class="dropdown-toggle">My Account</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="wishlist.html">Wishlist <span id="wishlist-nav-count" class="cart-badge wishlist-nav-count">0</span></a></li>
+                        <li><a href="cart.html">Bag <span id="cart-nav-count" class="cart-badge cart-nav-count">0</span></a></li>
+                        <li><a href="payment.html">Checkout</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="login.html" class="nav-btn">Log In</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-inner">
+                <div class="hero-copy">
+                    <p class="tag">Drop 01 &mdash; FW26 Collection</p>
+                    <h1>Built<br>For The<br><span class="outline">Block.</span></h1>
+                    <p>Clean cuts, bold basics, zero noise. Everyday streetwear made for class, the city, and everything after.</p>
+                    <div class="hero-actions">
+                        <a href="#shop" class="btn btn-accent">Shop the Drop &rarr;</a>
+                        <a href="#tops" class="btn btn-outline-light">Shop Tops</a>
+                    </div>
+                </div>
+                <div class="hero-visual" id="hero-visual">
+                    <span class="corner tl">Wardrobe.io</span>
+                    <span class="corner tr">FW26</span>
+                    <span class="corner bl">Drop 01</span>
+                    <span class="corner br">Northridge, CA</span>
+                    <div class="sticker">New<br>Drop</div>
+                    <!-- the big hoodie drawing is added here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Lime ticker -->
+        <div class="marquee-accent" aria-hidden="true">
+            <div class="marquee">
+                <span>Tops &#10022; Bottoms &#10022; Accessories &#10022; New Drop &#10022; Tops &#10022; Bottoms &#10022; Accessories &#10022; New Drop &#10022;&nbsp;</span>
+                <span>Tops &#10022; Bottoms &#10022; Accessories &#10022; New Drop &#10022; Tops &#10022; Bottoms &#10022; Accessories &#10022; New Drop &#10022;&nbsp;</span>
+            </div>
+        </div>
+
+        <!-- Shop by Category -->
+        <section class="section">
+            <div class="wrap">
+                <div class="section-head">
+                    <div>
+                        <p class="tag">00 / Categories</p>
+                        <h2>Shop By Category</h2>
+                    </div>
+                </div>
+                <div class="category-tiles" id="category-tiles"></div>
+            </div>
+        </section>
+
+        <!-- Products (filled in by JavaScript from the database) -->
+        <div id="shop">
+            <section class="section">
+                <div class="wrap">
+                    <div class="section-head" id="tops">
+                        <div>
+                            <p class="tag">01 / Tops</p>
+                            <h2>Tops</h2>
+                        </div>
+                        <span class="count" id="tops-count"></span>
+                    </div>
+                    <div class="product-grid" id="tops-grid"></div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="wrap">
+                    <div class="section-head" id="bottoms">
+                        <div>
+                            <p class="tag">02 / Bottoms</p>
+                            <h2>Bottoms</h2>
+                        </div>
+                        <span class="count" id="bottoms-count"></span>
+                    </div>
+                    <div class="product-grid" id="bottoms-grid"></div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="wrap">
+                    <div class="section-head" id="accessories">
+                        <div>
+                            <p class="tag">03 / Accessories</p>
+                            <h2>Accessories</h2>
+                        </div>
+                        <span class="count" id="accessories-count"></span>
+                    </div>
+                    <div class="product-grid" id="accessories-grid"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Manifesto -->
+        <section class="manifesto">
+            <div class="wrap">
+                <p class="tag">The Wardrobe.io Standard</p>
+                <h2>No Logos Screaming.<br><span class="outline">Just Good Fits.</span></h2>
+                <div class="points">
+                    <div class="point">
+                        <p class="num">[01]</p>
+                        <h3>Free Shipping</h3>
+                        <p>Every order over $50 ships free.</p>
+                    </div>
+                    <div class="point">
+                        <p class="num">[02]</p>
+                        <h3>Everyday Fits</h3>
+                        <p>Easy cuts you can wear on repeat, all week.</p>
+                    </div>
+                    <div class="point">
+                        <p class="num">[03]</p>
+                        <h3>Save The Heat</h3>
+                        <p>Tap the heart to keep pieces on your wishlist.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="wrap footer-grid">
+            <div>
+                <h4>Wardrobe.io</h4>
+                <p>Clean cuts, bold basics, zero noise. Everyday streetwear from the Valley. A CIT 480 group project at CSUN.</p>
+            </div>
+            <div>
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="index.html#tops">Tops</a></li>
+                    <li><a href="index.html#bottoms">Bottoms</a></li>
+                    <li><a href="index.html#accessories">Accessories</a></li>
                 </ul>
-            </li>
-
-            <li class="dropdown dropdown-right">
-                <a href="#" class="dropdown-toggle">My Account</a>
-                <ul class="dropdown-menu">
-                    <li><a href="wishlist.html">Wishlist <span id="wishlist-nav-count" class="cart-badge">0</span></a></li>
-                    <li><a href="cart.html">Cart <span id="cart-nav-count" class="cart-badge">0</span></a></li>
+            </div>
+            <div>
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="login.html">Log In</a></li>
+                    <li><a href="wishlist.html">Wishlist</a></li>
+                    <li><a href="cart.html">Bag</a></li>
                     <li><a href="payment.html">Checkout</a></li>
                 </ul>
-            </li>
+            </div>
+        </div>
+        <div class="wrap footer-bottom">
+            <span>&copy; 2026 Wardrobe.io</span>
+            <span>CIT 480 Clothing Store</span>
+        </div>
+        <p class="footer-wordmark" aria-hidden="true">Wardrobe.io</p>
+    </footer>
 
-            <li><a href="login.html" class="nav-btn">Log In</a></li>
-        </ul>
-    </nav>
-
-    <!-- Hero Banner -->
-    <div class="hero">
-        <h1>Wardrobe.io</h1>
-        <p>Simple, everyday clothing that fits your style.</p>
-        <a href="#shop" class="hero-btn">Shop Now</a>
-    </div>
-
-    <!-- Products (filled in by JavaScript) -->
-    <div class="shop-container" id="shop">
-        <h3 class="category-title" id="tops">Tops</h3>
-        <div class="product-grid" id="tops-grid"></div>
-
-        <h3 class="category-title" id="bottoms">Bottoms</h3>
-        <div class="product-grid" id="bottoms-grid"></div>
-
-        <h3 class="category-title" id="accessories">Accessories</h3>
-        <div class="product-grid" id="accessories-grid"></div>
-    </div>
-
+    <script src="js/site.js"></script>
     <script>
-        // Storage helpers (same keys as wishlist.html)
-        function getWishlist() {
-            const stored = localStorage.getItem('wardrobe_wishlist');
-            return stored ? JSON.parse(stored) : [];
-        }
+        const CATEGORIES = [
+            { key: 'tops', label: 'Tops', sample: { name: 'Hoodie', color: 'Black' } },
+            { key: 'bottoms', label: 'Bottoms', sample: { name: 'Cargo Pants', color: 'Olive' } },
+            { key: 'accessories', label: 'Accessories', sample: { name: 'Beanie', color: 'Black' } }
+        ];
 
-        function saveWishlist(items) {
-            localStorage.setItem('wardrobe_wishlist', JSON.stringify(items));
-        }
-
-        function getCart() {
-            const stored = localStorage.getItem('wardrobe_cart');
-            return stored ? JSON.parse(stored) : [];
-        }
-
-        function saveCart(items) {
-            localStorage.setItem('wardrobe_cart', JSON.stringify(items));
-        }
-
-        function updateNavCounts() {
-            const wishlistItems = getWishlist();
-            const cartCount = getCart().reduce((total, item) => total + (item.quantity || 1), 0);
-
-            document.getElementById('wishlist-nav-count').textContent = wishlistItems.length;
-            document.getElementById('cart-nav-count').textContent = cartCount;
-        }
-
-        // Global variable to hold fetched products from the database
+        // Products loaded from the database
         let products = [];
+
+        // turns 2 into "#002"
+        function itemNumber(id) {
+            return '#' + String(id).padStart(3, '0');
+        }
+
+        function renderHeroAndTiles() {
+            document.getElementById('hero-visual')
+                .insertAdjacentHTML('beforeend', garmentSVG({ name: 'Hoodie', color: 'Black' }));
+
+            document.getElementById('category-tiles').innerHTML = CATEGORIES.map(cat => `
+                <a href="#${cat.key}" class="tile tile-${cat.key}">
+                    <span class="arrow">Shop ${cat.label} &rarr;</span>
+                    ${garmentSVG(cat.sample)}
+                    <h3>${cat.label}</h3>
+                </a>
+            `).join('');
+        }
 
         async function fetchAndRenderProducts() {
             try {
-                const response = await fetch('http://localhost:3000/api/products');
-                if (!response.ok) throw new Error("Failed to fetch products from server");
-                
-                products = await response.json();
+                products = await api('/api/products');
                 renderProducts();
             } catch (error) {
-                console.error("Error loading product catalog:", error);
-                document.getElementById('shop').innerHTML = "<p style='text-align:center;'>Could not load products from the database. Please make sure your server is running.</p>";
+                console.error('Error loading product catalog:', error);
+                CATEGORIES.forEach(cat => {
+                    document.getElementById(`${cat.key}-grid`).innerHTML = `
+                        <div class="empty-state load-error">
+                            <p class="big">Store's Offline</p>
+                            <p>Could not load products from the database. Make sure the server is running (node server.js).</p>
+                        </div>`;
+                });
             }
+        }
+
+        function productCard(product) {
+            const sizes = Array.isArray(product.sizes) ? product.sizes : String(product.sizes || 'One Size').split(',');
+            const link = `product.html?id=${product.id}`;
+
+            return `
+                <article class="product-card">
+                    <a href="${link}" class="garment">
+                        <span class="item-no">${itemNumber(product.id)}</span>
+                        ${garmentSVG(product)}
+                    </a>
+                    <div class="product-body">
+                        <h4><a href="${link}">${escapeHtml(product.name)}</a></h4>
+                        <p class="product-meta">
+                            <span>${escapeHtml(product.color)}</span>
+                            <span class="price">${money(product.price)}</span>
+                        </p>
+                        <select id="size-${product.id}" aria-label="Size for ${escapeHtml(product.name)}">
+                            ${sizes.map(size => `<option value="${escapeHtml(size)}">Size: ${escapeHtml(size)}</option>`).join('')}
+                        </select>
+                        <button onclick="handleAddToCart(${product.id})">Add to Bag</button>
+                    </div>
+                </article>
+            `;
         }
 
         function renderProducts() {
-            const categories = ["tops", "bottoms", "accessories"];
+            CATEGORIES.forEach(cat => {
+                const grid = document.getElementById(`${cat.key}-grid`);
+                const items = products.filter(product => product.category === cat.key);
 
-            categories.forEach(category => {
-                const grid = document.getElementById(`${category}-grid`);
-                const items = products.filter(product => product.category === category);
+                document.getElementById(`${cat.key}-count`).textContent = `[${String(items.length).padStart(2, '0')} items]`;
 
                 if (items.length === 0) {
-                    grid.innerHTML = "<p style='color: #777; font-size: 14px;'>No items in this category yet.</p>";
+                    grid.innerHTML = `<p class="empty-state load-error">Nothing here yet. Check back for the next drop.</p>`;
                     return;
                 }
 
-                grid.innerHTML = items.map(product => {
-                    // Handle sizes array or fallback string from DB
-                    const sizeOptions = Array.isArray(product.sizes) 
-                        ? product.sizes 
-                        : typeof product.sizes === 'string' ? JSON.parse(product.sizes) : ["Standard"];
+                grid.innerHTML = items.map(productCard).join('');
 
-                    return `
-                        <div class="product-card">
-                            <div class="product-image" style="background-color: ${product.swatch || '#eee'};">${product.name}</div>
-                            <div class="product-info">
-                                <h4>${product.name}</h4>
-                                <p>Color: ${product.color} | <strong>$${parseFloat(product.price).toFixed(2)}</strong></p>
-                                <select id="size-${product.id}">
-                                    ${sizeOptions.map(size => `<option value="${size}">Size: ${size}</option>`).join('')}
-                                </select>
-                                <div class="product-actions">
-                                    <button onclick="addToCart(${product.id})">Add to Cart</button>
-                                    <button class="btn-secondary" onclick="addToWishlist(${product.id})">&#9825; Save</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                // put a heart (save to wishlist) button on each picture
+                items.forEach(product => {
+                    const picture = grid.querySelector(`a[href="product.html?id=${product.id}"].garment`);
+                    const heart = document.createElement('button');
+                    heart.className = 'heart-btn';
+                    heart.innerHTML = '&#9825;';
+                    heart.setAttribute('aria-label', `Save ${product.name} to wishlist`);
+                    heart.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        handleAddToWishlist(product.id, heart);
+                    });
+                    picture.appendChild(heart);
+                });
             });
         }
 
-        // Builds the item object that gets saved
-        function buildItem(productId) {
+        function selectedSize(productId) {
+            const select = document.getElementById(`size-${productId}`);
+            return select ? select.value : 'One Size';
+        }
+
+        async function handleAddToCart(productId) {
             const product = products.find(p => p.id === productId);
-            const sizeElement = document.getElementById(`size-${productId}`);
-            const size = sizeElement ? sizeElement.value : "Standard";
-
-            return {
-                name: product.name,
-                color: product.color,
-                size: size,
-                price: parseFloat(product.price)
-            };
-        }
-
-        function addToCart(productId) {
-            const newItem = buildItem(productId);
-            let cart = getCart();
-
-            const existing = cart.find(item => item.name === newItem.name && item.size === newItem.size);
-            if (existing) {
-                existing.quantity = (existing.quantity || 1) + 1;
-            } else {
-                newItem.quantity = 1;
-                cart.push(newItem);
+            const size = selectedSize(productId);
+            try {
+                await addItemToCart(product, size, 1);
+                showToast(`Added: ${product.name} / Size ${size}`);
+            } catch (error) {
+                console.error(error);
+                showToast('Could not add to bag. Is the server running?', true);
             }
-
-            saveCart(cart);
-            updateNavCounts();
-            alert(`"${newItem.name}" (Size ${newItem.size}) was added to your cart!`);
         }
 
-        function addToWishlist(productId) {
-            const newItem = buildItem(productId);
-            let wishlist = getWishlist();
-
-            const alreadySaved = wishlist.some(item => item.name === newItem.name && item.size === newItem.size);
-            if (alreadySaved) {
-                alert(`"${newItem.name}" is already in your wishlist.`);
-                return;
+        async function handleAddToWishlist(productId, heart) {
+            const product = products.find(p => p.id === productId);
+            const size = selectedSize(productId);
+            try {
+                const added = await addItemToWishlist(product, size);
+                heart.innerHTML = '&#9829;';
+                heart.style.backgroundColor = 'var(--accent)';
+                showToast(added ? `Saved: ${product.name}` : `${product.name} is already on your wishlist`);
+            } catch (error) {
+                console.error(error);
+                showToast('Could not save to wishlist. Is the server running?', true);
             }
-
-            wishlist.push(newItem);
-            saveWishlist(wishlist);
-            updateNavCounts();
-            alert(`"${newItem.name}" was saved to your wishlist!`);
         }
 
-        // Initial fetch and render on page load
         document.addEventListener('DOMContentLoaded', () => {
+            renderHeroAndTiles();
             fetchAndRenderProducts();
-            updateNavCounts();
         });
     </script>
-
-    <script>
-    // Check session status on page load
-    async function checkAuthSession() {
-        try {
-            const response = await fetch('http://localhost:3000/api/check-session'); // Optional, or manage via client state
-            // If you stored user state in localStorage upon login:
-            const currentUser = localStorage.getItem('wardrobe_user');
-            const loginBtn = document.querySelector('.nav-btn');
-
-            if (currentUser && loginBtn) {
-                loginBtn.textContent = `Hi, ${currentUser}`;
-                loginBtn.href = "#";
-                loginBtn.style.backgroundColor = "#333";
-                
-                // Optional: click to logout
-                loginBtn.onclick = async () => {
-                    if (confirm("Do you want to log out?")) {
-                        await fetch('http://localhost:3000/api/logout', { method: 'POST' });
-                        localStorage.removeItem('wardrobe_user');
-                        window.location.reload();
-                    }
-                };
-            }
-        } catch (e) {
-            console.error("Auth check error:", e);
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', checkAuthSession);
-</script>
 
 </body>
 

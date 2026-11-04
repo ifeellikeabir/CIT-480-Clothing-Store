@@ -4,431 +4,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wardrobe.io - Cart</title>
+    <title>Wardrobe.io - Bag</title>
+
+    <!-- Fonts: Anton (headlines), Inter (body), JetBrains Mono (labels) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Top Navigation Bar (same as index.html) */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: white;
-            padding: 15px 30px;
-            margin: -40px -20px 40px -20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            position: relative;
-            z-index: 10;
-        }
-        .nav-brand {
-            font-size: 22px;
-            font-weight: bold;
-            color: #111;
-            text-decoration: none;
-        }
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-links a {
-            text-decoration: none;
-            color: #444;
-            font-size: 15px;
-            font-weight: 500;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            color: #111;
-        }
-        .nav-btn {
-            background-color: #111;
-            color: white !important;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-        .nav-btn:hover {
-            background-color: #333 !important;
-        }
-        .cart-badge {
-            background-color: #111;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-left: 4px;
-        }
-
-        /* Dropdown Menus */
-        .dropdown {
-            position: relative;
-        }
-        .dropdown-toggle::after {
-            content: " \25BE";
-            font-size: 12px;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            min-width: 170px;
-            list-style: none;
-            margin: 0;
-            padding: 8px 0;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
-        }
-        .dropdown:hover .dropdown-menu,
-        .dropdown:focus-within .dropdown-menu {
-            display: block;
-        }
-        .dropdown-right .dropdown-menu {
-            left: auto;
-            right: 0;
-        }
-        .dropdown-menu a {
-            display: block;
-            padding: 10px 18px;
-        }
-        .dropdown-menu a:hover {
-            background-color: #f4f4f4;
-        }
-
-        /* Cart Container */
-        .cart-container {
-            background-color: white;
-            max-width: 800px;
-            margin: auto;
-            padding: 35px;
-            border-radius: 12px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
-        }
-        .cart-list {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            background-color: #fafafa;
-        }
-        .item-details h4 {
-            margin: 0 0 5px 0;
-            font-size: 18px;
-            color: #222;
-        }
-        .item-details p {
-            margin: 0;
-            color: #666;
-            font-size: 15px;
-        }
-        .item-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .quantity-control span {
-            min-width: 20px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .btn-qty {
-            background-color: #fff;
-            color: #111;
-            border: 1px solid #ccc;
-            width: 34px;
-            height: 34px;
-            padding: 0;
-            margin-top: 0;
-            font-size: 18px;
-        }
-        .btn-qty:hover {
-            background-color: #f0f0f0;
-            border-color: #999;
-        }
-        .btn-danger {
-            background-color: #fff;
-            color: #d9534f;
-            border: 1px solid #d9534f;
-            padding: 10px 16px;
-            width: auto;
-            margin-top: 0;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .btn-danger:hover {
-            background-color: #fdf2f2;
-        }
-
-        /* Order Summary */
-        .cart-summary {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-        }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 16px;
-            margin-bottom: 10px;
-            color: #555;
-        }
-        .summary-total {
-            font-size: 20px;
-            font-weight: bold;
-            color: #111;
-            margin-top: 15px;
-        }
-        .checkout-btn {
-            display: block;
-            text-align: center;
-            text-decoration: none;
-            padding: 14px;
-            background-color: #111;
-            color: white;
-            border-radius: 6px;
-            font-size: 17px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-        .checkout-btn:hover {
-            background-color: #333;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-        .empty-state p {
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        .empty-state a {
-            color: #111;
-            font-weight: bold;
-            text-decoration: underline;
-        }
-
-        /* Phone layout */
-        @media (max-width: 700px) {
-            .navbar {
-                flex-direction: column;
-                gap: 12px;
-                padding: 15px;
-            }
-            .nav-links {
-                gap: 15px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .cart-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    </style>
 </head>
 
 <body>
 
-    <!-- Top Navigation Bar -->
-    <nav class="navbar">
-        <a href="index.html" class="nav-brand">Wardrobe.io</a>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
+    <!-- Scrolling ticker -->
+    <div class="announce" role="note" aria-label="Free shipping on all orders over $50">
+        <div class="marquee" aria-hidden="true">
+            <span>Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp; Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp;</span>
+            <span>Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp; Free shipping on orders over <b>$50</b> &nbsp;&#9670;&nbsp; New drop is live &nbsp;&#9670;&nbsp; Wardrobe.io &mdash; Est. 2026 &nbsp;&#9670;&nbsp;</span>
+        </div>
+    </div>
 
-            <li class="dropdown">
-                <a href="index.html#shop" class="dropdown-toggle">Shop</a>
-                <ul class="dropdown-menu">
+    <!-- Top Navigation Bar -->
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <span class="brand-name">Wardrobe.io</span>
+                <span class="brand-tag">Est. 2026 / Northridge, CA</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+
+                <li class="dropdown">
+                    <a href="index.html#shop" class="dropdown-toggle">Shop</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="index.html#tops">Tops</a></li>
+                        <li><a href="index.html#bottoms">Bottoms</a></li>
+                        <li><a href="index.html#accessories">Accessories</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown dropdown-right">
+                    <a href="#" class="dropdown-toggle active">My Account</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="wishlist.html">Wishlist <span id="wishlist-nav-count" class="cart-badge wishlist-nav-count">0</span></a></li>
+                        <li><a href="cart.html" class="active">Bag <span id="cart-nav-count" class="cart-badge cart-nav-count">0</span></a></li>
+                        <li><a href="payment.html">Checkout</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="login.html" class="nav-btn">Log In</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Page Banner -->
+        <section class="page-banner">
+            <div class="wrap">
+                <p class="tag">/// Your Bag</p>
+                <h1>The Bag</h1>
+                <p id="cart-header">Loading your bag...</p>
+            </div>
+        </section>
+
+        <div class="wrap page-body">
+            <div class="two-col" id="cart-layout">
+
+                <!-- Cart items get added here by JavaScript -->
+                <section class="panel">
+                    <h3 class="panel-title">Items</h3>
+                    <div id="cart-content"></div>
+                </section>
+
+                <!-- Order Summary -->
+                <aside class="panel summary-panel" id="cart-summary">
+                    <h3 class="panel-title">Order Summary</h3>
+
+                    <div class="ship-meter" id="ship-meter">
+                        <span id="ship-message"></span>
+                        <div class="bar"><div class="fill" id="ship-fill" style="width: 0%;"></div></div>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span id="shipping">$0.00</span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <span>Total</span>
+                        <span id="total">$0.00</span>
+                    </div>
+
+                    <a href="payment.html" class="btn btn-accent btn-block" id="checkout-btn">Checkout &rarr;</a>
+                    <a href="index.html#shop" class="btn btn-outline btn-block">Keep Shopping</a>
+                </aside>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="wrap footer-grid">
+            <div>
+                <h4>Wardrobe.io</h4>
+                <p>Clean cuts, bold basics, zero noise. Everyday streetwear from the Valley. A CIT 480 group project at CSUN.</p>
+            </div>
+            <div>
+                <h4>Shop</h4>
+                <ul>
                     <li><a href="index.html#tops">Tops</a></li>
                     <li><a href="index.html#bottoms">Bottoms</a></li>
                     <li><a href="index.html#accessories">Accessories</a></li>
                 </ul>
-            </li>
-
-            <li class="dropdown dropdown-right">
-                <a href="#" class="dropdown-toggle active">My Account</a>
-                <ul class="dropdown-menu">
-                    <li><a href="wishlist.html">Wishlist <span id="wishlist-nav-count" class="cart-badge">0</span></a></li>
-                    <li><a href="cart.html" class="active">Cart <span id="cart-nav-count" class="cart-badge">0</span></a></li>
+            </div>
+            <div>
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="login.html">Log In</a></li>
+                    <li><a href="wishlist.html">Wishlist</a></li>
+                    <li><a href="cart.html">Bag</a></li>
                     <li><a href="payment.html">Checkout</a></li>
                 </ul>
-            </li>
-
-            <li><a href="login.html" class="nav-btn">Log In</a></li>
-        </ul>
-    </nav>
-
-    <h1>Wardrobe.io</h1>
-    <h2>My Cart</h2>
-
-    <div class="cart-container">
-        <h3 id="cart-header">Cart Items (0)</h3>
-
-        <!-- Cart items get added here by JavaScript -->
-        <div id="cart-content" class="cart-list"></div>
-
-        <!-- Order Summary (hidden when the cart is empty) -->
-        <div id="cart-summary" class="cart-summary">
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <span id="subtotal">$0.00</span>
             </div>
-            <div class="summary-row">
-                <span>Shipping</span>
-                <span id="shipping">$0.00</span>
-            </div>
-            <div class="summary-row summary-total">
-                <span>Total</span>
-                <span id="total">$0.00</span>
-            </div>
-            <a href="payment.html" class="checkout-btn">Proceed to Checkout</a>
         </div>
-    </div>
+        <div class="wrap footer-bottom">
+            <span>&copy; 2026 Wardrobe.io</span>
+            <span>CIT 480 Clothing Store</span>
+        </div>
+        <p class="footer-wordmark" aria-hidden="true">Wardrobe.io</p>
+    </footer>
 
+    <script src="js/site.js"></script>
     <script>
-        // Fetch cart items from MySQL backend
-        async function getCart() {
-            try {
-                const response = await fetch('http://localhost:3000/api/cart');
-                if (!response.ok) throw new Error('Failed to fetch cart');
-                return await response.json();
-            } catch (error) {
-                console.error("Error loading cart:", error);
-                return [];
-            }
-        }
+        function updateSummary(items) {
+            const subtotal = items.reduce((sum, item) => sum + parseFloat(item.price) * (item.quantity || 1), 0);
+            const shipping = shippingFor(subtotal);
 
-        // Fetch wishlist items for badge counts
-        async function getWishlistCount() {
-            try {
-                const response = await fetch('http://localhost:3000/api/wishlist');
-                if (!response.ok) return 0;
-                const wishlist = await response.json();
-                return wishlist.length;
-            } catch (error) {
-                return 0;
-            }
-        }
+            document.getElementById('subtotal').textContent = money(subtotal);
+            document.getElementById('shipping').textContent = shipping === 0 ? 'Free' : money(shipping);
+            document.getElementById('total').textContent = money(subtotal + shipping);
 
-        async function updateNavCounts() {
-            const cartItems = await getCart();
-            const wishlistCount = await getWishlistCount();
-            
-            document.getElementById('cart-nav-count').textContent = cartItems.length;
-            document.getElementById('wishlist-nav-count').textContent = wishlistCount;
+            // free shipping progress bar
+            const left = FREE_SHIPPING_MIN - subtotal;
+            document.getElementById('ship-message').textContent = left > 0
+                ? `${money(left)} away from free shipping`
+                : 'Free shipping unlocked';
+            document.getElementById('ship-fill').style.width = Math.min(100, subtotal / FREE_SHIPPING_MIN * 100) + '%';
         }
 
         async function renderCart() {
-            const items = await getCart();
+            const items = await getCartItems();
             const container = document.getElementById('cart-content');
-            const subtotalElem = document.getElementById('cart-subtotal');
-            const totalElem = document.getElementById('cart-total');
+            const itemCount = items.reduce((total, item) => total + (item.quantity || 1), 0);
 
+            document.getElementById('cart-header').textContent =
+                `[${String(itemCount).padStart(2, '0')}] item${itemCount === 1 ? '' : 's'} in your bag`;
+            document.getElementById('cart-summary').style.display = items.length ? 'block' : 'none';
+            document.getElementById('cart-layout').style.gridTemplateColumns = items.length ? '' : '1fr';
             updateNavCounts();
 
             if (items.length === 0) {
-                if (container) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <p>Your cart is currently empty.</p>
-                            <a href="index.html#shop" style="color: #111; font-weight: bold; text-decoration: underline;">Explore Products</a>
-                        </div>
-                    `;
-                }
-                if (subtotalElem) subtotalElem.textContent = '$0.00';
-                if (totalElem) totalElem.textContent = '$0.00';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p class="big">Bag's Empty.</p>
+                        <p>Nothing in here yet. Go find something.</p>
+                        <a href="index.html#shop" class="btn btn-accent">Shop the Drop &rarr;</a>
+                    </div>
+                `;
                 return;
             }
 
-            // Calculate totals
-            let subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) * (item.quantity || 1)), 0);
-            let shipping = subtotal >= 50 ? 0 : 5.99;
-            let total = subtotal + shipping;
+            updateSummary(items);
 
-            if (subtotalElem) subtotalElem.textContent = `$${subtotal.toFixed(2)}`;
-            if (totalElem) totalElem.textContent = `$${total.toFixed(2)}`;
-
-            if (container) {
-                container.innerHTML = items.map((item) => `
-                    <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee;">
-                        <div class="item-details">
-                            <h4>${item.name}</h4>
-                            <p>Color: ${item.color || 'Standard'} | Size: ${item.size} | Qty: ${item.quantity || 1}</p>
-                            <p><strong>$${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}</strong></p>
+            container.innerHTML = items.map(item => {
+                const look = { ...item, id: item.product_id || item.id };
+                const qty = item.quantity || 1;
+                return `
+                    <div class="line-item">
+                        <div class="garment">${garmentSVG(look)}</div>
+                        <div>
+                            <h4>${escapeHtml(item.name)}</h4>
+                            <p class="details">${escapeHtml(item.color || 'Standard')} / Size ${escapeHtml(item.size)} / ${money(item.price)} ea</p>
+                            <div class="qty">
+                                <button onclick="changeQuantity(${item.id}, ${qty - 1})" aria-label="Decrease quantity">&minus;</button>
+                                <span>${qty}</span>
+                                <button onclick="changeQuantity(${item.id}, ${qty + 1})" aria-label="Increase quantity">+</button>
+                            </div>
+                            <button class="btn-link" onclick="removeCartItem(${item.id})">Remove</button>
                         </div>
-                        <div class="item-actions">
-                            <button class="btn-danger" onclick="removeCartItem(${item.id})">Remove</button>
-                        </div>
+                        <div class="line-price">${money(parseFloat(item.price) * qty)}</div>
                     </div>
-                `).join('');
+                `;
+            }).join('');
+        }
+
+        async function changeQuantity(id, newQuantity) {
+            // going below 1 removes the item
+            if (newQuantity < 1) {
+                return removeCartItem(id);
+            }
+            try {
+                await api(`/api/cart/${id}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ quantity: newQuantity })
+                });
+                renderCart();
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+                showToast('Could not update the quantity.', true);
             }
         }
 
         async function removeCartItem(id) {
             try {
-                const response = await fetch(`http://localhost:3000/api/cart/${id}`, {
-                    method: 'DELETE'
-                });
-                if (!response.ok) throw new Error('Failed to delete cart item');
+                await api(`/api/cart/${id}`, { method: 'DELETE' });
+                showToast('Removed from your bag');
                 renderCart();
             } catch (error) {
                 console.error('Error removing cart item:', error);
-                alert('Could not remove item from cart.');
+                showToast('Could not remove item from your bag.', true);
             }
         }
 
-        // Initial render on page load
         document.addEventListener('DOMContentLoaded', renderCart);
     </script>
-
-    <script>
-    // Check session status on page load
-    async function checkAuthSession() {
-        try {
-            const response = await fetch('http://localhost:3000/api/check-session'); // Optional, or manage via client state
-            // If you stored user state in localStorage upon login:
-            const currentUser = localStorage.getItem('wardrobe_user');
-            const loginBtn = document.querySelector('.nav-btn');
-
-            if (currentUser && loginBtn) {
-                loginBtn.textContent = `Hi, ${currentUser}`;
-                loginBtn.href = "#";
-                loginBtn.style.backgroundColor = "#333";
-                
-                // Optional: click to logout
-                loginBtn.onclick = async () => {
-                    if (confirm("Do you want to log out?")) {
-                        await fetch('http://localhost:3000/api/logout', { method: 'POST' });
-                        localStorage.removeItem('wardrobe_user');
-                        window.location.reload();
-                    }
-                };
-            }
-        } catch (e) {
-            console.error("Auth check error:", e);
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', checkAuthSession);
-</script>
 
 </body>
 
