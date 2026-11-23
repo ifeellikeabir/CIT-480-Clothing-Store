@@ -12,3 +12,4 @@ node_modules/
 
 # Local database backups
 wardrobe_backup.sql
+.DS_Store
