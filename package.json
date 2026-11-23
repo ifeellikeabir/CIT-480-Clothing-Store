@@ -2,7 +2,7 @@
   "name": "cit-480-clothing-store-main",
   "version": "1.0.0",
   "description": "This is our CIT 480 clothing store website project",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"

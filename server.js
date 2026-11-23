@@ -1,11 +1,21 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Configure session middleware before routes
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'change_this_secret_in_production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // Set to true if serving strictly over HTTPS with trust proxy enabled
+}));
 
 // Serve the website files too, so the whole site runs at http://localhost:3000
 app.use(express.static(__dirname));
@@ -43,7 +53,7 @@ app.get('/api/products', (req, res) => {
             console.error(err);
             return res.status(500).json({ error: 'Database error while fetching products' });
         }
-        
+
         // Format sizes string back into an array for frontend compatibility (e.g. 'S,M,L,XL' -> ['S', 'M', 'L', 'XL'])
         const formattedProducts = results.map(product => ({
             ...product,
@@ -59,7 +69,7 @@ app.post('/api/orders', (req, res) => {
     const { total_amount, shipping_name, shipping_email, shipping_address, city, state, zip_code, items } = req.body;
 
     const orderQuery = `
-        INSERT INTO orders (total_amount, shipping_name, shipping_email, shipping_address, city, state, zip_code) 
+        INSERT INTO orders (total_amount, shipping_name, shipping_email, shipping_address, city, state, zip_code)
         VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -70,12 +80,6 @@ app.post('/api/orders', (req, res) => {
         }
         res.status(201).json({ message: 'Order placed successfully!', orderId: result.insertId });
     });
-});
-
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
 
 // ==========================
@@ -98,7 +102,7 @@ app.get('/api/cart', (req, res) => {
 app.post('/api/cart', (req, res) => {
     const { product_id, name, color, size, price, quantity } = req.body;
     const query = 'INSERT INTO cart_items (product_id, name, color, size, price, quantity) VALUES (?, ?, ?, ?, ?, ?)';
-    
+
     db.query(query, [product_id, name, color, size, price, quantity || 1], (err, result) => {
         if (err) {
             console.error(err);
@@ -140,7 +144,7 @@ app.delete('/api/cart', (req, res) => {
 app.delete('/api/cart/:id', (req, res) => {
     const cartId = req.params.id;
     const query = 'DELETE FROM cart_items WHERE id = ?';
-    
+
     db.query(query, [cartId], (err, result) => {
         if (err) {
             console.error(err);
@@ -170,7 +174,7 @@ app.get('/api/wishlist', (req, res) => {
 app.post('/api/wishlist', (req, res) => {
     const { product_id, name, color, size, price } = req.body;
     const query = 'INSERT INTO wishlist_items (product_id, name, color, size, price) VALUES (?, ?, ?, ?, ?)';
-    
+
     db.query(query, [product_id, name, color, size, price], (err, result) => {
         if (err) {
             console.error(err);
@@ -184,7 +188,7 @@ app.post('/api/wishlist', (req, res) => {
 app.delete('/api/wishlist/:id', (req, res) => {
     const wishlistId = req.params.id;
     const query = 'DELETE FROM wishlist_items WHERE id = ?';
-    
+
     db.query(query, [wishlistId], (err, result) => {
         if (err) {
             console.error(err);
@@ -193,17 +197,6 @@ app.delete('/api/wishlist/:id', (req, res) => {
         res.json({ message: 'Wishlist item removed' });
     });
 });
-
-const session = require('express-session');
-const bcrypt = require('bcrypt');
-
-// Configure session middleware
-app.use(session({
-    secret: 'your_super_secret_key_here', // Change this to a secure random string for production
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS
-}));
 
 // ==========================
 // AUTHENTICATION API ENDPOINTS
@@ -216,7 +209,7 @@ app.post('/api/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         // the users table calls this column `name`
         const query = 'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)';
-        
+
         db.query(query, [username, email, hashedPassword], (err, result) => {
             if (err) {
                 console.error(err);
@@ -234,19 +227,19 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const query = 'SELECT * FROM users WHERE name = ?';
-    
+
     db.query(query, [username], async (err, results) => {
         if (err || results.length === 0) {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
-        
+
         const user = results[0];
         const match = await bcrypt.compare(password, user.password_hash);
-        
+
         if (!match) {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
-        
+
         // Save user session
         req.session.userId = user.id;
         req.session.username = user.name;
@@ -262,4 +255,10 @@ app.post('/api/logout', (req, res) => {
         res.clearCookie('connect.sid');
         res.json({ message: 'Logged out successfully' });
     });
+});
+
+// Start the server after all routes and middleware are registered
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

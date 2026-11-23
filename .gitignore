@@ -1,2 +1,14 @@
 .env
 node_modules/
+# macOS
+.DS_Store
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Dependencies
+node_modules/
+
+# Local database backups
+wardrobe_backup.sql
