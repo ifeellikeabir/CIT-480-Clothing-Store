@@ -1,24 +1,36 @@
+
 const express = require('express');
 const mysql = require('mysql2');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
-app.use(express.json());
+const PORT = process.env.PORT || 3000;
+const isProduction = process.env.NODE_ENV === 'production';
 
-// Configure session middleware before routes
+app.use(express.json());
+app.set('trust proxy', 1);
+
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'change_this_secret_in_production',
+    secret: process.env.SESSION_SECRET || 'local-development-only-secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true if serving strictly over HTTPS with trust proxy enabled
+    cookie: {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000
+    }
 }));
 
-// Serve the website files too, so the whole site runs at http://localhost:3000
-app.use(express.static(require('path').join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Create connection pool to MySQL database
+// ==========================
+// DATABASE
+// ==========================
+
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -29,141 +41,321 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-// Test the database connection
 db.getConnection((err, connection) => {
     if (err) {
-        console.error('❌ Error connecting to MySQL database:', err.message);
+        console.error('Database connection failed:', err.message);
     } else {
-        console.log('✅ Connected to MySQL database (`wardrobe_db`) successfully!');
+        console.log('Connected to MySQL successfully');
         connection.release();
     }
 });
 
 // ==========================
-// API ENDPOINTS
+// AUTHENTICATION
 // ==========================
 
-// 1. Get all products (replaces hardcoded products array in index.html)
-app.get('/api/products', (req, res) => {
-    const query = 'SELECT * FROM products';
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Database error while fetching products' });
+function requireAuth(req, res, next) {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Please log in first' });
+    }
+    next();
+}
+
+// Current logged-in user
+app.get('/api/me', (req, res) => {
+    if (!req.session.userId) {
+        return res.json({ loggedIn: false });
+    }
+
+    res.json({
+        loggedIn: true,
+        userId: req.session.userId,
+        username: req.session.username
+    });
+});
+
+// Register
+app.post('/api/register', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                error: 'Name, email, and password are required'
+            });
         }
 
-        // Format sizes string back into an array for frontend compatibility (e.g. 'S,M,L,XL' -> ['S', 'M', 'L', 'XL'])
+        if (password.length < 8) {
+            return res.status(400).json({
+                error: 'Password must be at least 8 characters'
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const passwordHash = await bcrypt.hash(password, 12);
+
+        db.query(
+            'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
+            [name.trim(), normalizedEmail, passwordHash],
+            (err, result) => {
+                if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(409).json({
+                            error: 'An account with this email already exists'
+                        });
+                    }
+
+                    console.error(err);
+                    return res.status(500).json({
+                        error: 'Registration failed'
+                    });
+                }
+
+                req.session.regenerate((sessionErr) => {
+                    if (sessionErr) {
+                        return res.status(500).json({
+                            error: 'Session creation failed'
+                        });
+                    }
+
+                    req.session.userId = result.insertId;
+                    req.session.username = name.trim();
+
+                    res.status(201).json({
+                        message: 'Registration successful',
+                        username: name.trim()
+                    });
+                });
+            }
+        );
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Registration failed' });
+    }
+});
+
+// Login
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({
+            error: 'Email and password are required'
+        });
+    }
+
+    db.query(
+        'SELECT * FROM users WHERE email = ?',
+        [email.trim().toLowerCase()],
+        async (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    error: 'Login failed'
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(401).json({
+                    error: 'Invalid email or password'
+                });
+            }
+
+            const user = results[0];
+
+            try {
+                const validPassword = await bcrypt.compare(
+                    password,
+                    user.password_hash
+                );
+
+                if (!validPassword) {
+                    return res.status(401).json({
+                        error: 'Invalid email or password'
+                    });
+                }
+
+                req.session.regenerate((sessionErr) => {
+                    if (sessionErr) {
+                        return res.status(500).json({
+                            error: 'Session creation failed'
+                        });
+                    }
+
+                    req.session.userId = user.id;
+                    req.session.username = user.name;
+
+                    res.json({
+                        message: 'Login successful',
+                        username: user.name
+                    });
+                });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Login failed' });
+            }
+        }
+    );
+});
+
+// Logout
+app.post('/api/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({
+                error: 'Logout failed'
+            });
+        }
+
+        res.clearCookie('connect.sid');
+        res.json({ message: 'Logged out successfully' });
+    });
+});
+
+// ==========================
+// PRODUCTS
+// ==========================
+
+app.get('/api/products', (req, res) => {
+    db.query('SELECT * FROM products', (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                error: 'Failed to fetch products'
+            });
+        }
+
         const formattedProducts = results.map(product => ({
             ...product,
-            sizes: product.sizes.split(',')
+            sizes: typeof product.sizes === 'string'
+                ? product.sizes.split(',').map(s => s.trim())
+                : []
         }));
 
         res.json(formattedProducts);
     });
 });
 
-// 2. Checkout / Place Order endpoint (receives data from payment.html)
-app.post('/api/orders', (req, res) => {
-    const { total_amount, shipping_name, shipping_email, shipping_address, city, state, zip_code, items } = req.body;
-
-    const orderQuery = `
-        INSERT INTO orders (total_amount, shipping_name, shipping_email, shipping_address, city, state, zip_code)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    db.query(orderQuery, [total_amount, shipping_name, shipping_email, shipping_address, city, state, zip_code], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Failed to place order' });
-        }
-        res.status(201).json({ message: 'Order placed successfully!', orderId: result.insertId });
-    });
-});
-
-// Require users to be logged in before accessing private data
-function requireAuth(req, res, next) {
-    if (!req.session.userId) {
-        return res.status(401).json({ error: 'Please log in first' });
-    }
-
-    next();
-}
-
-
 // ==========================
-// CART API ENDPOINTS
+// CART
 // ==========================
 
-// Get only the logged-in user's cart
+// Get user's cart
 app.get('/api/cart', requireAuth, (req, res) => {
-    const query = 'SELECT * FROM cart_items WHERE user_id = ?';
+    db.query(
+        'SELECT * FROM cart_items WHERE user_id = ?',
+        [req.session.userId],
+        (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    error: 'Failed to fetch cart'
+                });
+            }
 
-    db.query(query, [req.session.userId], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Database error fetching cart' });
+            res.json(results);
         }
-
-        res.json(results);
-    });
+    );
 });
 
-// Add an item to the logged-in user's cart
+// Add to cart
 app.post('/api/cart', requireAuth, (req, res) => {
     const { product_id, name, color, size, price, quantity } = req.body;
 
-    const query = `
-        INSERT INTO cart_items
-        (user_id, product_id, name, color, size, price, quantity)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
+    if (!product_id || !size || !quantity || quantity < 1) {
+        return res.status(400).json({
+            error: 'Invalid cart item'
+        });
+    }
 
     db.query(
-        query,
-        [req.session.userId, product_id, name, color, size, price, quantity || 1],
+        `INSERT INTO cart_items
+        (user_id, product_id, name, color, size, price, quantity)
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+            req.session.userId,
+            product_id,
+            name,
+            color,
+            size,
+            price,
+            quantity
+        ],
         (err, result) => {
             if (err) {
                 console.error(err);
-                return res.status(500).json({ error: 'Failed to add item to cart' });
+                return res.status(500).json({
+                    error: 'Failed to add item to cart'
+                });
             }
 
             res.status(201).json({
-                message: 'Added to cart successfully',
+                message: 'Added to cart',
                 id: result.insertId
             });
         }
     );
 });
 
-// Change quantity only if the cart item belongs to this user
+// Update cart quantity
 app.patch('/api/cart/:id', requireAuth, (req, res) => {
     const quantity = parseInt(req.body.quantity, 10);
 
-    if (!quantity || quantity < 1) {
-        return res.status(400).json({ error: 'Quantity must be at least 1' });
+    if (!Number.isInteger(quantity) || quantity < 1) {
+        return res.status(400).json({
+            error: 'Quantity must be at least 1'
+        });
     }
 
-    const query = `
-        UPDATE cart_items
-        SET quantity = ?
-        WHERE id = ? AND user_id = ?
-    `;
+    db.query(
+        `UPDATE cart_items
+         SET quantity = ?
+         WHERE id = ? AND user_id = ?`,
+        [quantity, req.params.id, req.session.userId],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    error: 'Failed to update cart'
+                });
+            }
 
-    db.query(query, [quantity, req.params.id, req.session.userId], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Failed to update cart item' });
+            if (!result.affectedRows) {
+                return res.status(404).json({
+                    error: 'Cart item not found'
+                });
+            }
+
+            res.json({ message: 'Cart updated' });
         }
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Cart item not found' });
-        }
-
-        res.json({ message: 'Cart item updated' });
-    });
+    );
 });
 
-// Empty only this user's cart
+// Remove single cart item
+app.delete('/api/cart/:id', requireAuth, (req, res) => {
+    db.query(
+        'DELETE FROM cart_items WHERE id = ? AND user_id = ?',
+        [req.params.id, req.session.userId],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    error: 'Failed to remove cart item'
+                });
+            }
+
+            if (!result.affectedRows) {
+                return res.status(404).json({
+                    error: 'Cart item not found'
+                });
+            }
+
+            res.json({ message: 'Cart item removed' });
+        }
+    );
+});
+
+// Clear user's cart
 app.delete('/api/cart', requireAuth, (req, res) => {
     db.query(
         'DELETE FROM cart_items WHERE user_id = ?',
@@ -171,7 +363,9 @@ app.delete('/api/cart', requireAuth, (req, res) => {
         (err) => {
             if (err) {
                 console.error(err);
-                return res.status(500).json({ error: 'Failed to clear cart' });
+                return res.status(500).json({
+                    error: 'Failed to clear cart'
+                });
             }
 
             res.json({ message: 'Cart cleared' });
@@ -179,128 +373,190 @@ app.delete('/api/cart', requireAuth, (req, res) => {
     );
 });
 
-// Remove an item only if it belongs to this user
-app.delete('/api/cart/:id', requireAuth, (req, res) => {
-    const query = 'DELETE FROM cart_items WHERE id = ? AND user_id = ?';
-
-    db.query(query, [req.params.id, req.session.userId], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Failed to remove cart item' });
-        }
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Cart item not found' });
-        }
-
-        res.json({ message: 'Cart item removed' });
-    });
-});
-
 // ==========================
-// WISHLIST API ENDPOINTS
+// WISHLIST
 // ==========================
 
-// Get wishlist items
-app.get('/api/wishlist', (req, res) => {
-    const query = 'SELECT * FROM wishlist_items';
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Database error fetching wishlist' });
-        }
-        res.json(results);
-    });
-});
-
-// Add item to wishlist
-app.post('/api/wishlist', (req, res) => {
-    const { product_id, name, color, size, price } = req.body;
-    const query = 'INSERT INTO wishlist_items (product_id, name, color, size, price) VALUES (?, ?, ?, ?, ?)';
-
-    db.query(query, [product_id, name, color, size, price], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Failed to add to wishlist' });
-        }
-        res.status(201).json({ message: 'Added to wishlist successfully', id: result.insertId });
-    });
-});
-
-// Remove item from wishlist
-app.delete('/api/wishlist/:id', (req, res) => {
-    const wishlistId = req.params.id;
-    const query = 'DELETE FROM wishlist_items WHERE id = ?';
-
-    db.query(query, [wishlistId], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Failed to remove wishlist item' });
-        }
-        res.json({ message: 'Wishlist item removed' });
-    });
-});
-
-
-// ==========================
-// WISHLIST API ENDPOINTS
-// ==========================
-
-// Get only the logged-in user's wishlist
+// Get wishlist
 app.get('/api/wishlist', requireAuth, (req, res) => {
-    const query = 'SELECT * FROM wishlist_items WHERE user_id = ?';
+    db.query(
+        'SELECT * FROM wishlist_items WHERE user_id = ?',
+        [req.session.userId],
+        (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    error: 'Failed to fetch wishlist'
+                });
+            }
 
-    db.query(query, [req.session.userId], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Database error fetching wishlist' });
+            res.json(results);
         }
-
-        res.json(results);
-    });
+    );
 });
 
-// Add an item to the logged-in user's wishlist
+// Add to wishlist
 app.post('/api/wishlist', requireAuth, (req, res) => {
     const { product_id, name, color, size, price } = req.body;
 
-    const query = `
-        INSERT INTO wishlist_items
-        (user_id, product_id, name, color, size, price)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `;
+    if (!product_id || !size) {
+        return res.status(400).json({
+            error: 'Product and size are required'
+        });
+    }
 
     db.query(
-        query,
-        [req.session.userId, product_id, name, color, size, price],
+        `INSERT INTO wishlist_items
+        (user_id, product_id, name, color, size, price)
+        VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+            req.session.userId,
+            product_id,
+            name,
+            color,
+            size,
+            price
+        ],
         (err, result) => {
             if (err) {
                 console.error(err);
-                return res.status(500).json({ error: 'Failed to add to wishlist' });
+                return res.status(500).json({
+                    error: 'Failed to add to wishlist'
+                });
             }
 
             res.status(201).json({
-                message: 'Added to wishlist successfully',
+                message: 'Added to wishlist',
                 id: result.insertId
             });
         }
     );
 });
 
-// Remove an item only if it belongs to this user
+// Remove from wishlist
 app.delete('/api/wishlist/:id', requireAuth, (req, res) => {
-    const query = 'DELETE FROM wishlist_items WHERE id = ? AND user_id = ?';
+    db.query(
+        'DELETE FROM wishlist_items WHERE id = ? AND user_id = ?',
+        [req.params.id, req.session.userId],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    error: 'Failed to remove wishlist item'
+                });
+            }
 
-    db.query(query, [req.params.id, req.session.userId], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Failed to remove wishlist item' });
+            if (!result.affectedRows) {
+                return res.status(404).json({
+                    error: 'Wishlist item not found'
+                });
+            }
+
+            res.json({ message: 'Wishlist item removed' });
         }
+    );
+});
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Wishlist item not found' });
+// ==========================
+// CHECKOUT
+// ==========================
+
+// No real payment processing is performed
+app.post('/api/orders', requireAuth, (req, res) => {
+    const {
+        shipping_name,
+        shipping_email,
+        shipping_address,
+        city,
+        state,
+        zip_code
+    } = req.body;
+
+    if (
+        !shipping_name ||
+        !shipping_email ||
+        !shipping_address ||
+        !city ||
+        !state ||
+        !zip_code
+    ) {
+        return res.status(400).json({
+            error: 'Please complete all shipping fields'
+        });
+    }
+
+    // Calculate order total using items stored in the user's cart
+    db.query(
+        'SELECT price, quantity FROM cart_items WHERE user_id = ?',
+        [req.session.userId],
+        (cartErr, cartItems) => {
+            if (cartErr) {
+                console.error(cartErr);
+                return res.status(500).json({
+                    error: 'Failed to retrieve cart'
+                });
+            }
+
+            if (!cartItems.length) {
+                return res.status(400).json({
+                    error: 'Your cart is empty'
+                });
+            }
+
+            const total = cartItems.reduce(
+                (sum, item) => sum + (Number(item.price) * item.quantity),
+                0
+            );
+
+            db.query(
+                `INSERT INTO orders
+                (user_id, total_amount, shipping_name, shipping_email,
+                 shipping_address, city, state, zip_code)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    req.session.userId,
+                    total.toFixed(2),
+                    shipping_name,
+                    shipping_email,
+                    shipping_address,
+                    city,
+                    state,
+                    zip_code
+                ],
+                (orderErr, result) => {
+                    if (orderErr) {
+                        console.error(orderErr);
+                        return res.status(500).json({
+                            error: 'Failed to place order'
+                        });
+                    }
+
+                    // Clear cart after order is saved
+                    db.query(
+                        'DELETE FROM cart_items WHERE user_id = ?',
+                        [req.session.userId],
+                        (clearErr) => {
+                            if (clearErr) {
+                                console.error(clearErr);
+                            }
+
+                            res.status(201).json({
+                                message: 'Order placed successfully',
+                                orderId: result.insertId,
+                                total: total.toFixed(2)
+                            });
+                        }
+                    );
+                }
+            );
         }
+    );
+});
 
-        res.json({ message: 'Wishlist item removed' });
-    });
+// ==========================
+// START SERVER
+// ==========================
+
+app.listen(PORT, () => {
+    console.log(`Wardrobe server running on port ${PORT}`);
 });
