@@ -7,7 +7,7 @@
 // - draws a simple clothing picture for each product
 // ==========================================================
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = '';
 const FREE_SHIPPING_MIN = 50;
 const SHIPPING_COST = 5.99;
 

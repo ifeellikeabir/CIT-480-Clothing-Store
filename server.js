@@ -1,12 +1,10 @@
 const express = require('express');
 const mysql = require('mysql2');
-const cors = require('cors');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
 app.use(express.json());
 
 // Configure session middleware before routes
@@ -18,7 +16,7 @@ app.use(session({
 }));
 
 // Serve the website files too, so the whole site runs at http://localhost:3000
-app.use(express.static(__dirname));
+app.use(express.static(require('path').join(__dirname, 'public')));
 
 // Create connection pool to MySQL database
 const db = mysql.createPool({
@@ -82,74 +80,119 @@ app.post('/api/orders', (req, res) => {
     });
 });
 
+// Require users to be logged in before accessing private data
+function requireAuth(req, res, next) {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Please log in first' });
+    }
+
+    next();
+}
+
+
 // ==========================
 // CART API ENDPOINTS
 // ==========================
 
-// Get cart items
-app.get('/api/cart', (req, res) => {
-    const query = 'SELECT * FROM cart_items';
-    db.query(query, (err, results) => {
+// Get only the logged-in user's cart
+app.get('/api/cart', requireAuth, (req, res) => {
+    const query = 'SELECT * FROM cart_items WHERE user_id = ?';
+
+    db.query(query, [req.session.userId], (err, results) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: 'Database error fetching cart' });
         }
+
         res.json(results);
     });
 });
 
-// Add item to cart
-app.post('/api/cart', (req, res) => {
+// Add an item to the logged-in user's cart
+app.post('/api/cart', requireAuth, (req, res) => {
     const { product_id, name, color, size, price, quantity } = req.body;
-    const query = 'INSERT INTO cart_items (product_id, name, color, size, price, quantity) VALUES (?, ?, ?, ?, ?, ?)';
 
-    db.query(query, [product_id, name, color, size, price, quantity || 1], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Failed to add item to cart' });
+    const query = `
+        INSERT INTO cart_items
+        (user_id, product_id, name, color, size, price, quantity)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(
+        query,
+        [req.session.userId, product_id, name, color, size, price, quantity || 1],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to add item to cart' });
+            }
+
+            res.status(201).json({
+                message: 'Added to cart successfully',
+                id: result.insertId
+            });
         }
-        res.status(201).json({ message: 'Added to cart successfully', id: result.insertId });
-    });
+    );
 });
 
-// Change the quantity of a cart item
-app.patch('/api/cart/:id', (req, res) => {
+// Change quantity only if the cart item belongs to this user
+app.patch('/api/cart/:id', requireAuth, (req, res) => {
     const quantity = parseInt(req.body.quantity, 10);
+
     if (!quantity || quantity < 1) {
         return res.status(400).json({ error: 'Quantity must be at least 1' });
     }
 
-    const query = 'UPDATE cart_items SET quantity = ? WHERE id = ?';
-    db.query(query, [quantity, req.params.id], (err) => {
+    const query = `
+        UPDATE cart_items
+        SET quantity = ?
+        WHERE id = ? AND user_id = ?
+    `;
+
+    db.query(query, [quantity, req.params.id, req.session.userId], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: 'Failed to update cart item' });
         }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Cart item not found' });
+        }
+
         res.json({ message: 'Cart item updated' });
     });
 });
 
-// Empty the whole cart (used after an order is placed)
-app.delete('/api/cart', (req, res) => {
-    db.query('DELETE FROM cart_items', (err) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Failed to clear cart' });
+// Empty only this user's cart
+app.delete('/api/cart', requireAuth, (req, res) => {
+    db.query(
+        'DELETE FROM cart_items WHERE user_id = ?',
+        [req.session.userId],
+        (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to clear cart' });
+            }
+
+            res.json({ message: 'Cart cleared' });
         }
-        res.json({ message: 'Cart cleared' });
-    });
+    );
 });
 
-// Remove item from cart
-app.delete('/api/cart/:id', (req, res) => {
-    const cartId = req.params.id;
-    const query = 'DELETE FROM cart_items WHERE id = ?';
+// Remove an item only if it belongs to this user
+app.delete('/api/cart/:id', requireAuth, (req, res) => {
+    const query = 'DELETE FROM cart_items WHERE id = ? AND user_id = ?';
 
-    db.query(query, [cartId], (err, result) => {
+    db.query(query, [req.params.id, req.session.userId], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: 'Failed to remove cart item' });
         }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Cart item not found' });
+        }
+
         res.json({ message: 'Cart item removed' });
     });
 });
@@ -198,67 +241,66 @@ app.delete('/api/wishlist/:id', (req, res) => {
     });
 });
 
+
 // ==========================
-// AUTHENTICATION API ENDPOINTS
+// WISHLIST API ENDPOINTS
 // ==========================
 
-// Register a new user
-app.post('/api/register', async (req, res) => {
-    const { username, email, password } = req.body;
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        // the users table calls this column `name`
-        const query = 'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)';
+// Get only the logged-in user's wishlist
+app.get('/api/wishlist', requireAuth, (req, res) => {
+    const query = 'SELECT * FROM wishlist_items WHERE user_id = ?';
 
-        db.query(query, [username, email, hashedPassword], (err, result) => {
+    db.query(query, [req.session.userId], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Database error fetching wishlist' });
+        }
+
+        res.json(results);
+    });
+});
+
+// Add an item to the logged-in user's wishlist
+app.post('/api/wishlist', requireAuth, (req, res) => {
+    const { product_id, name, color, size, price } = req.body;
+
+    const query = `
+        INSERT INTO wishlist_items
+        (user_id, product_id, name, color, size, price)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(
+        query,
+        [req.session.userId, product_id, name, color, size, price],
+        (err, result) => {
             if (err) {
                 console.error(err);
-                return res.status(500).json({ error: 'Username or email already exists' });
+                return res.status(500).json({ error: 'Failed to add to wishlist' });
             }
-            res.status(201).json({ message: 'User registered successfully!' });
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error during registration' });
-    }
+
+            res.status(201).json({
+                message: 'Added to wishlist successfully',
+                id: result.insertId
+            });
+        }
+    );
 });
 
-// Login user
-app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
-    const query = 'SELECT * FROM users WHERE name = ?';
+// Remove an item only if it belongs to this user
+app.delete('/api/wishlist/:id', requireAuth, (req, res) => {
+    const query = 'DELETE FROM wishlist_items WHERE id = ? AND user_id = ?';
 
-    db.query(query, [username], async (err, results) => {
-        if (err || results.length === 0) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+    db.query(query, [req.params.id, req.session.userId], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to remove wishlist item' });
         }
 
-        const user = results[0];
-        const match = await bcrypt.compare(password, user.password_hash);
-
-        if (!match) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Wishlist item not found' });
         }
 
-        // Save user session
-        req.session.userId = user.id;
-        req.session.username = user.name;
-
-        res.json({ message: 'Logged in successfully', username: user.name });
+        res.json({ message: 'Wishlist item removed' });
     });
-});
-
-// Logout user
-app.post('/api/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) return res.status(500).json({ error: 'Could not log out' });
-        res.clearCookie('connect.sid');
-        res.json({ message: 'Logged out successfully' });
-    });
-});
-
-// Start the server after all routes and middleware are registered
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
